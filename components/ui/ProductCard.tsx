@@ -1,155 +1,106 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Image } from 'expo-image';
 import React from 'react';
-import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-
-const { width: screenWidth } = Dimensions.get('window');
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { ImageWithFallback } from './ImageWithFallback';
 
 interface ProductCardProps {
-  product: {
-    id: number;
-    name: string;
-    price: string;
-    originalPrice?: string;
-    image: string;
-    discount?: string;
-  };
+  image?: any;
+  title: string;
+  price: string;
+  originalPrice?: string;
   onPress?: () => void;
-  onWishlistPress?: () => void;
-  isWishlisted?: boolean;
-  showWishlistButton?: boolean;
-  showDiscount?: boolean;
-  showOriginalPrice?: boolean;
-  cardWidth?: number;
-  imageHeight?: number;
+  onAddToCart?: () => void;
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({
-  product,
+  image,
+  title,
+  price,
+  originalPrice,
   onPress,
-  onWishlistPress,
-  isWishlisted = false,
-  showWishlistButton = false,
-  showDiscount = false,
-  showOriginalPrice = false,
-  cardWidth = (screenWidth - 48) / 2,
-  imageHeight = 200,
+  onAddToCart,
 }) => {
   return (
-    <TouchableOpacity
-      style={[styles.productCard, { width: cardWidth }]}
-      onPress={onPress}
-    >
-      <View style={styles.imageContainer}>
-        <Image
-          source={{ uri: product.image }}
-          style={[styles.productImage, { height: imageHeight }]}
-          contentFit="cover"
-        />
-        
-        {showWishlistButton && (
-          <TouchableOpacity
-            style={styles.wishlistButton}
-            onPress={onWishlistPress}
-          >
-            <Ionicons
-              name={isWishlisted ? "heart" : "heart-outline"}
-              size={20}
-              color={isWishlisted ? "#ef4444" : "white"}
-            />
-          </TouchableOpacity>
-        )}
-        
-        {showDiscount && product.discount && (
-          <View style={styles.discountBadge}>
-            <Text style={styles.discountText}>{product.discount}</Text>
-          </View>
-        )}
-      </View>
-      
-      <View style={styles.productInfo}>
-        <Text style={styles.productName} numberOfLines={2}>
-          {product.name}
+    <Pressable style={styles.container} onPress={onPress}>
+      <ImageWithFallback
+        source={image}
+        style={styles.image}
+        resizeMode="cover"
+        fallbackColor="#f5f5f5"
+      />
+      <View style={styles.content}>
+        <Text style={styles.title} numberOfLines={2}>
+          {title}
         </Text>
-        
         <View style={styles.priceContainer}>
-          <Text style={styles.productPrice}>{product.price}</Text>
-          {showOriginalPrice && product.originalPrice && (
-            <Text style={styles.originalPrice}>{product.originalPrice}</Text>
+          <Text style={styles.price}>{price}</Text>
+          {originalPrice && (
+            <Text style={styles.originalPrice}>{originalPrice}</Text>
           )}
         </View>
+        <Pressable style={styles.addToCartButton} onPress={onAddToCart}>
+          <Ionicons name="cart-outline" size={16} color="white" />
+        </Pressable>
       </View>
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 
 const styles = StyleSheet.create({
-  productCard: {
-    backgroundColor: 'white',
+  container: {
+    width: 160,
+    backgroundColor: '#23262F',
     borderRadius: 12,
-    marginBottom: 16,
-    elevation: 2,
+    marginRight: 12,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.3,
     shadowRadius: 4,
+    elevation: 3,
   },
-  imageContainer: {
-    position: 'relative',
-  },
-  productImage: {
+  image: {
     width: '100%',
+    height: 160,
     borderTopLeftRadius: 12,
     borderTopRightRadius: 12,
   },
-  wishlistButton: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    borderRadius: 16,
-    width: 32,
-    height: 32,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  discountBadge: {
-    position: 'absolute',
-    top: 8,
-    left: 8,
-    backgroundColor: '#ef4444',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-  },
-  discountText: {
-    color: 'white',
-    fontSize: 10,
-    fontWeight: 'bold',
-  },
-  productInfo: {
+  content: {
     padding: 12,
   },
-  productName: {
+  title: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#333',
-    marginBottom: 4,
+    color: '#F4F4F4',
+    marginBottom: 8,
     lineHeight: 18,
   },
   priceContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 8,
   },
-  productPrice: {
+  price: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#1e3a8a',
-    marginRight: 8,
+    fontWeight: '700',
+    color: '#F4F4F4',
   },
   originalPrice: {
-    fontSize: 12,
-    color: '#999',
+    fontSize: 14,
+    color: '#A0A0A0',
     textDecorationLine: 'line-through',
+  },
+  addToCartButton: {
+    position: 'absolute',
+    bottom: 12,
+    right: 12,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#FF6B9D',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 }); 

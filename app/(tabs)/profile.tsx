@@ -1,144 +1,138 @@
-import { Header } from '@/components/ui/Header';
+import { SafeAreaView } from '@/components/ui/SafeAreaProvider';
 import { Ionicons } from '@expo/vector-icons';
-import { Image } from 'expo-image';
-import React from 'react';
+import React, { useState } from 'react';
 import {
-    ScrollView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Image,
+  Pressable,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  View
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
-const profileMenuItems = [
+import { AppHeader } from '@/components/ui/AppHeader';
+import { Drawer } from '@/components/ui/Drawer';
+import { useDrawer } from '@/hooks/useDrawer';
+
+const profileOptions = [
   {
-    id: 1,
+    id: 'orders',
     title: 'My Orders',
     icon: 'bag-outline',
-    badge: '3',
+    subtitle: 'Track your orders',
   },
   {
-    id: 2,
-    title: 'My Wishlist',
-    icon: 'heart-outline',
-    badge: '12',
-  },
-  {
-    id: 3,
-    title: 'My Reviews',
-    icon: 'star-outline',
-  },
-  {
-    id: 4,
+    id: 'addresses',
     title: 'My Addresses',
     icon: 'location-outline',
+    subtitle: 'Manage delivery addresses',
   },
   {
-    id: 5,
+    id: 'payments',
     title: 'Payment Methods',
     icon: 'card-outline',
+    subtitle: 'Manage payment options',
   },
   {
-    id: 6,
+    id: 'settings',
     title: 'Settings',
     icon: 'settings-outline',
+    subtitle: 'App preferences',
   },
   {
-    id: 7,
+    id: 'help',
     title: 'Help & Support',
     icon: 'help-circle-outline',
-  },
-  {
-    id: 8,
-    title: 'About Us',
-    icon: 'information-circle-outline',
+    subtitle: 'Get help and contact us',
   },
 ];
 
-
-
-const ProfileInfo = () => (
-  <View style={styles.profileSection}>
-    <View style={styles.profileHeader}>
-      <Image
-        source={{ uri: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face' }}
-        style={styles.profileImage}
-        contentFit="cover"
-      />
-      <View style={styles.profileInfo}>
-        <Text style={styles.profileName}>John Doe</Text>
-        <Text style={styles.profileEmail}>john.doe@example.com</Text>
-        <View style={styles.profileStats}>
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>12</Text>
-            <Text style={styles.statLabel}>Orders</Text>
-          </View>
-          <View style={styles.statDivider} />
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>8</Text>
-            <Text style={styles.statLabel}>Reviews</Text>
-          </View>
-          <View style={styles.statDivider} />
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>3</Text>
-            <Text style={styles.statLabel}>Wishlist</Text>
-          </View>
-        </View>
-      </View>
-      <TouchableOpacity style={styles.editButton}>
-        <Ionicons name="pencil" size={16} color="#666" />
-      </TouchableOpacity>
-    </View>
-  </View>
-);
-
-const MenuItem = ({ item }: { item: typeof profileMenuItems[0] }) => (
-  <TouchableOpacity style={styles.menuItem}>
-    <View style={styles.menuItemLeft}>
-      <Ionicons name={item.icon as any} size={24} color="#666" />
-      <Text style={styles.menuItemTitle}>{item.title}</Text>
-    </View>
-    <View style={styles.menuItemRight}>
-      {item.badge && (
-        <View style={styles.badge}>
-          <Text style={styles.badgeText}>{item.badge}</Text>
-        </View>
-      )}
-      <Ionicons name="chevron-forward" size={20} color="#ccc" />
-    </View>
-  </TouchableOpacity>
-);
-
-const LogoutButton = () => (
-  <TouchableOpacity style={styles.logoutButton}>
-    <Ionicons name="log-out-outline" size={20} color="#ef4444" />
-    <Text style={styles.logoutText}>Logout</Text>
-  </TouchableOpacity>
-);
-
 export default function ProfileScreen() {
+  const [cartCount, setCartCount] = useState(0);
+  const {
+    isDrawerVisible,
+    openDrawer,
+    closeDrawer,
+    handleCategoryPress,
+    handleSubCategoryPress,
+  } = useDrawer();
+
+  const handleMenuPress = () => {
+    openDrawer();
+  };
+
+  const handleOptionPress = (optionId: string) => {
+    console.log('Option pressed:', optionId);
+  };
+
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="white" />
-      <Header 
+    <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
+      <StatusBar barStyle="light-content" backgroundColor="#181A20" />
+      
+      <AppHeader
         title="Profile"
-        rightIcons={[{ name: "notifications-outline" }]}
+        cartCount={cartCount}
+        showLogo={false}
+        onMenuPress={handleMenuPress}
+        onSearchPress={() => console.log('Search pressed')}
+        onWishlistPress={() => console.log('Wishlist pressed')}
+        onCartPress={() => console.log('Cart pressed')}
       />
+
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        <ProfileInfo />
-        <View style={styles.menuSection}>
-          {profileMenuItems.map((item) => (
-            <MenuItem key={item.id} item={item} />
+        {/* Profile Header */}
+        <View style={styles.profileHeader}>
+          <Image
+            source={{ uri: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop' }}
+            style={styles.profileImage}
+          />
+          <View style={styles.profileInfo}>
+            <Text style={styles.profileName}>John Doe</Text>
+            <Text style={styles.profileEmail}>john.doe@example.com</Text>
+            <Text style={styles.profileMember}>Member since 2023</Text>
+          </View>
+        </View>
+
+        {/* Profile Options */}
+        <View style={styles.optionsContainer}>
+          {profileOptions.map((option) => (
+            <Pressable
+              key={option.id}
+              style={styles.optionItem}
+              onPress={() => handleOptionPress(option.id)}
+            >
+              <View style={styles.optionIcon}>
+                <Ionicons name={option.icon as any} size={24} color="#F4F4F4" />
+              </View>
+              <View style={styles.optionContent}>
+                <Text style={styles.optionTitle}>{option.title}</Text>
+                <Text style={styles.optionSubtitle}>{option.subtitle}</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color="#A0A0A0" />
+            </Pressable>
           ))}
         </View>
-        <LogoutButton />
+
+        {/* Logout Button */}
+        <View style={styles.logoutContainer}>
+          <Pressable style={styles.logoutButton}>
+            <Ionicons name="log-out-outline" size={20} color="#FF6B9D" />
+            <Text style={styles.logoutText}>Logout</Text>
+          </Pressable>
+        </View>
       </ScrollView>
+
+      <Drawer
+        isVisible={isDrawerVisible}
+        onClose={closeDrawer}
+        onCategoryPress={handleCategoryPress}
+        onSubCategoryPress={handleSubCategoryPress}
+      />
     </SafeAreaView>
   );
 }
@@ -146,27 +140,20 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: '#181A20',
   },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: 20,
-  },
-  
-
-
-  // Profile Section Styles
-  profileSection: {
-    padding: 16,
-    backgroundColor: 'white',
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    paddingBottom: 100, // Space for bottom tab bar
   },
   profileHeader: {
     flexDirection: 'row',
     alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 24,
+    backgroundColor: '#23262F',
   },
   profileImage: {
     width: 80,
@@ -179,105 +166,72 @@ const styles = StyleSheet.create({
   },
   profileName: {
     fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: '700',
+    color: '#F4F4F4',
     marginBottom: 4,
   },
   profileEmail: {
     fontSize: 14,
-    color: '#666',
-    marginBottom: 12,
+    color: '#A0A0A0',
+    marginBottom: 4,
   },
-  profileStats: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  statItem: {
-    alignItems: 'center',
-    flex: 1,
-  },
-  statNumber: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1e3a8a',
-  },
-  statLabel: {
+  profileMember: {
     fontSize: 12,
-    color: '#666',
-    marginTop: 2,
+    color: '#FF6B9D',
   },
-  statDivider: {
-    width: 1,
-    height: 30,
-    backgroundColor: '#f0f0f0',
-    marginHorizontal: 8,
+  optionsContainer: {
+    backgroundColor: '#23262F',
+    marginTop: 12,
   },
-  editButton: {
-    padding: 8,
-    borderWidth: 1,
-    borderColor: '#f0f0f0',
-    borderRadius: 20,
-  },
-
-  // Menu Section Styles
-  menuSection: {
-    backgroundColor: 'white',
-    marginTop: 16,
-  },
-  menuItem: {
+  optionItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
+    paddingHorizontal: 20,
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: '#1E1E1E',
   },
-  menuItemLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  menuItemTitle: {
-    fontSize: 16,
-    color: '#333',
-    marginLeft: 12,
-  },
-  menuItemRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  badge: {
-    backgroundColor: '#ef4444',
-    borderRadius: 10,
-    minWidth: 20,
-    height: 20,
+  optionIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#1E1E1E',
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 8,
+    marginRight: 16,
   },
-  badgeText: {
-    color: 'white',
-    fontSize: 12,
-    fontWeight: 'bold',
+  optionContent: {
+    flex: 1,
   },
-
-  // Logout Button Styles
+  optionTitle: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#F4F4F4',
+    marginBottom: 2,
+  },
+  optionSubtitle: {
+    fontSize: 14,
+    color: '#A0A0A0',
+  },
+  logoutContainer: {
+    paddingHorizontal: 20,
+    paddingVertical: 24,
+    backgroundColor: '#23262F',
+    marginTop: 12,
+  },
   logoutButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 24,
-    marginHorizontal: 16,
-    paddingVertical: 16,
+    paddingVertical: 12,
     borderWidth: 1,
-    borderColor: '#ef4444',
+    borderColor: '#FF6B9D',
     borderRadius: 8,
   },
   logoutText: {
     fontSize: 16,
-    color: '#ef4444',
-    fontWeight: '600',
+    fontWeight: '500',
+    color: '#FF6B9D',
     marginLeft: 8,
   },
 }); 

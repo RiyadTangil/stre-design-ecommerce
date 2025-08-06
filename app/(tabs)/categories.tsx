@@ -1,63 +1,131 @@
-import { Header } from '@/components/ui/Header';
-import React from 'react';
+import { SafeAreaView } from '@/components/ui/SafeAreaProvider';
+import React, { useState } from 'react';
 import {
-  Dimensions,
+  FlatList,
   ScrollView,
   StatusBar,
   StyleSheet,
   Text,
-  TouchableOpacity,
-  View,
+  View
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
-const { width: screenWidth } = Dimensions.get('window');
+import { AppHeader } from '@/components/ui/AppHeader';
+import { CategoryCard } from '@/components/ui/CategoryCard';
+import { Drawer } from '@/components/ui/Drawer';
+import { useDrawer } from '@/hooks/useDrawer';
 
+// Mock data for categories
 const categories = [
-  { id: 1, name: 'Mobiles', icon: '📱', color: '#ec4899' },
-  { id: 2, name: 'Electronics', icon: '🎧', color: '#3b82f6' },
-  { id: 3, name: 'Fashion', icon: '👕', color: '#10b981' },
-  { id: 4, name: 'Furniture', icon: '🛋️', color: '#f59e0b' },
-  { id: 5, name: 'Grocery', icon: '🛒', color: '#8b5cf6' },
-  { id: 6, name: 'Appliances', icon: '📺', color: '#ef4444' },
-  { id: 7, name: 'Toys', icon: '🧸', color: '#06b6d4' },
-  { id: 8, name: 'Books', icon: '📚', color: '#84cc16' },
-  { id: 9, name: 'Sports', icon: '⚽', color: '#f97316' },
-  { id: 10, name: 'Beauty', icon: '💄', color: '#ec4899' },
-  { id: 11, name: 'Health', icon: '💊', color: '#10b981' },
-  { id: 12, name: 'Automotive', icon: '🚗', color: '#6b7280' },
+  { 
+    id: '1', 
+    image: { uri: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=200&h=200&fit=crop' }, 
+    title: 'Electronics' 
+  },
+  { 
+    id: '2', 
+    image: { uri: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=200&h=200&fit=crop' }, 
+    title: 'Fashion' 
+  },
+  { 
+    id: '3', 
+    image: { uri: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop' }, 
+    title: 'Home & Garden' 
+  },
+  { 
+    id: '4', 
+    image: { uri: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=200&h=200&fit=crop' }, 
+    title: 'Sports' 
+  },
+  { 
+    id: '5', 
+    image: { uri: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=200&h=200&fit=crop' }, 
+    title: 'Books' 
+  },
+  { 
+    id: '6', 
+    image: { uri: 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=200&h=200&fit=crop' }, 
+    title: 'Toys & Games' 
+  },
+  { 
+    id: '7', 
+    image: { uri: 'https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?w=200&h=200&fit=crop' }, 
+    title: 'Beauty' 
+  },
+  { 
+    id: '8', 
+    image: { uri: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200&h=200&fit=crop' }, 
+    title: 'Automotive' 
+  },
 ];
 
-
-
-const CategoryItem = ({ category }: { category: typeof categories[0] }) => (
-  <TouchableOpacity style={styles.categoryItem}>
-    <View style={[styles.categoryIcon, { borderColor: category.color }]}>
-      <Text style={styles.categoryIconText}>{category.icon}</Text>
-    </View>
-    <Text style={styles.categoryName}>{category.name}</Text>
-  </TouchableOpacity>
-);
-
 export default function CategoriesScreen() {
+  const [cartCount, setCartCount] = useState(2);
+  const {
+    isDrawerVisible,
+    openDrawer,
+    closeDrawer,
+    handleCategoryPress,
+    handleSubCategoryPress,
+  } = useDrawer();
+
+  const handleMenuPress = () => {
+    openDrawer();
+  };
+
+  const handleCategoriesScreenCategoryPress = (category: any) => {
+    console.log('Category pressed:', category.title);
+  };
+
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="white" />
-      <Header 
+    <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
+      <StatusBar barStyle="light-content" backgroundColor="#181A20" />
+      
+      <AppHeader
         title="Categories"
-        rightIcons={[{ name: "search" }]}
+        cartCount={cartCount}
+        showLogo={false}
+        onMenuPress={handleMenuPress}
+        onSearchPress={() => console.log('Search pressed')}
+        onWishlistPress={() => console.log('Wishlist pressed')}
+        onCartPress={() => console.log('Cart pressed')}
       />
+
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        <View style={styles.categoryGrid}>
-          {categories.map((category) => (
-            <CategoryItem key={category.id} category={category} />
-          ))}
+        {/* Categories Header */}
+        <View style={styles.header}>
+          <Text style={styles.title}>All Categories</Text>
+          <Text style={styles.subtitle}>Browse through our wide selection</Text>
+        </View>
+
+        {/* Categories Grid */}
+        <View style={styles.categoriesContainer}>
+          <FlatList
+            data={categories}
+            renderItem={({ item }) => (
+                             <CategoryCard
+                 image={item.image}
+                 title={item.title}
+                 onPress={() => handleCategoriesScreenCategoryPress(item)}
+               />
+            )}
+            keyExtractor={(item) => item.id}
+            numColumns={2}
+            scrollEnabled={false}
+            contentContainerStyle={styles.categoriesGrid}
+          />
         </View>
       </ScrollView>
+
+      <Drawer
+        isVisible={isDrawerVisible}
+        onClose={closeDrawer}
+        onCategoryPress={handleCategoryPress}
+        onSubCategoryPress={handleSubCategoryPress}
+      />
     </SafeAreaView>
   );
 }
@@ -65,50 +133,34 @@ export default function CategoriesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: '#181A20',
   },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
-    padding: 16,
+    paddingBottom: 100, // Space for bottom tab bar
   },
-  
-
-
-  // Category Grid Styles
-  categoryGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
+  header: {
+    paddingHorizontal: 20,
+    paddingVertical: 24,
+    backgroundColor: '#23262F',
   },
-  categoryItem: {
-    width: (screenWidth - 64) / 3,
-    alignItems: 'center',
-    marginBottom: 24,
+  title: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#F4F4F4',
+    marginBottom: 8,
   },
-  categoryIcon: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    borderWidth: 2,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 12,
-    backgroundColor: 'white',
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+  subtitle: {
+    fontSize: 16,
+    color: '#A0A0A0',
   },
-  categoryIconText: {
-    fontSize: 32,
+  categoriesContainer: {
+    backgroundColor: '#23262F',
+    paddingVertical: 20,
   },
-  categoryName: {
-    fontSize: 14,
-    color: '#333',
-    textAlign: 'center',
-    fontWeight: '500',
+  categoriesGrid: {
+    paddingHorizontal: 20,
   },
 }); 

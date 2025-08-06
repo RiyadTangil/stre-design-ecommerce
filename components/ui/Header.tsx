@@ -1,106 +1,131 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 
 interface HeaderProps {
   title: string;
-  leftIcon?: string;
-  rightIcons?: Array<{
-    name: string;
-    onPress?: () => void;
-    badge?: string;
-  }>;
-  onLeftPress?: () => void;
+  onMenuPress?: () => void;
+  onSearchPress?: () => void;
+  onWishlistPress?: () => void;
+  onCartPress?: () => void;
+  cartCount?: number;
+  showLogo?: boolean;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   title,
-  leftIcon,
-  rightIcons = [],
-  onLeftPress,
+  onMenuPress,
+  onSearchPress,
+  onWishlistPress,
+  onCartPress,
+  cartCount = 0,
+  showLogo = false,
 }) => {
   return (
-    <View style={styles.header}>
-      <View style={styles.leftSection}>
-        {leftIcon && (
-          <TouchableOpacity style={styles.headerButton} onPress={onLeftPress}>
-            <Ionicons name={leftIcon as any} size={24} color="#333" />
-          </TouchableOpacity>
-        )}
-      </View>
-      
-      <Text style={styles.headerTitle}>{title}</Text>
-      
-      <View style={styles.rightSection}>
-        {rightIcons.map((icon, index) => (
-          <TouchableOpacity
-            key={index}
-            style={styles.headerButton}
-            onPress={icon.onPress}
-          >
-            <View style={styles.iconContainer}>
-              <Ionicons name={icon.name as any} size={24} color="#333" />
-              {icon.badge && (
-                <View style={styles.badge}>
-                  <Text style={styles.badgeText}>{icon.badge}</Text>
-                </View>
-              )}
+    <View style={styles.container}>
+      <View style={styles.headerContent}>
+        <View style={styles.leftSection}>
+          <Pressable style={styles.menuButton} onPress={onMenuPress}>
+            <Ionicons name="menu" size={24} color="#F4F4F4" />
+          </Pressable>
+          {showLogo ? (
+            <View style={styles.logoContainer}>
+              <Image
+                source={{ uri: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=100&h=100&fit=crop' }}
+                style={styles.logo}
+              />
+              {/* <Text style={styles.logoText}>Star Design</Text> */}
             </View>
-          </TouchableOpacity>
-        ))}
+          ) : (
+            <Text style={styles.title}>{title}</Text>
+          )}
+        </View>
+        <View style={styles.rightSection}>
+          <Pressable style={styles.iconButton} onPress={onSearchPress}>
+            <Ionicons name="search" size={24} color="#F4F4F4" />
+          </Pressable>
+          <Pressable style={styles.iconButton} onPress={onWishlistPress}>
+            <Ionicons name="heart-outline" size={24} color="#F4F4F4" />
+          </Pressable>
+          <Pressable style={styles.cartButton} onPress={onCartPress}>
+            <Ionicons name="cart-outline" size={24} color="#F4F4F4" />
+            {cartCount > 0 && (
+              <View style={styles.cartBadge}>
+                <Text style={styles.cartBadgeText}>{cartCount}</Text>
+              </View>
+            )}
+          </Pressable>
+        </View>
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  header: {
+  container: {
+    backgroundColor: '#181A20',
+    borderBottomWidth: 1,
+    borderBottomColor: '#23262F',
+  },
+  headerContent: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: 'white',
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
   },
   leftSection: {
     flexDirection: 'row',
     alignItems: 'center',
-    minWidth: 40,
+  },
+  menuButton: {
+    marginRight: 16,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#F4F4F4',
+  },
+  logoContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  logo: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    marginRight: 8,
+  },
+  logoText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#F4F4F4',
   },
   rightSection: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    flex: 1,
-    textAlign: 'center',
+  iconButton: {
+    marginLeft: 16,
   },
-  headerButton: {
-    padding: 8,
-    marginLeft: 8,
-  },
-  iconContainer: {
+  cartButton: {
+    marginLeft: 16,
     position: 'relative',
   },
-  badge: {
+  cartBadge: {
     position: 'absolute',
-    top: -2,
-    right: -2,
-    backgroundColor: '#ef4444',
+    top: -8,
+    right: -8,
+    backgroundColor: '#FF6B9D',
     borderRadius: 10,
     minWidth: 20,
     height: 20,
-    alignItems: 'center',
     justifyContent: 'center',
+    alignItems: 'center',
   },
-  badgeText: {
-    color: 'white',
+  cartBadgeText: {
     fontSize: 12,
-    fontWeight: 'bold',
+    fontWeight: '600',
+    color: 'white',
   },
 }); 

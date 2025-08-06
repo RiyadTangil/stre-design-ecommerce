@@ -14,8 +14,8 @@ import { Drawer } from '@/components/ui/Drawer';
 import { ProductCard } from '@/components/ui/ProductCard';
 import { useDrawer } from '@/hooks/useDrawer';
 
-// Mock data for wishlist items
-const wishlistItems = [
+// Mock data for category products
+const categoryProducts = [
   {
     id: '1',
     image: { uri: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop' },
@@ -46,8 +46,8 @@ const wishlistItems = [
   },
 ];
 
-export default function WishlistScreen() {
-  const [cartCount, setCartCount] = useState(1);
+export default function CategoryScreen() {
+  const [cartCount, setCartCount] = useState(2);
   const {
     isDrawerVisible,
     openDrawer,
@@ -56,16 +56,16 @@ export default function WishlistScreen() {
     handleSubCategoryPress,
   } = useDrawer();
 
-  const handleMenuPress = () => {
-    openDrawer();
-  };
-
   const handleAddToCart = () => {
     setCartCount(prev => prev + 1);
   };
 
   const handleProductPress = (product: any) => {
     console.log('Product pressed:', product.title);
+  };
+
+  const handleMenuPress = () => {
+    openDrawer();
   };
 
   const renderProductCard = ({ item }: { item: any }) => (
@@ -83,8 +83,9 @@ export default function WishlistScreen() {
     <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
       <StatusBar barStyle="light-content" backgroundColor="#181A20" />
       
+      {/* Header - Shows text instead of logo on non-home pages */}
       <AppHeader
-        title="Wishlist"
+        title="Fashion"
         cartCount={cartCount}
         showLogo={false}
         onMenuPress={handleMenuPress}
@@ -98,25 +99,29 @@ export default function WishlistScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {/* Wishlist Header */}
-        <View style={styles.header}>
-          <Text style={styles.title}>My Wishlist</Text>
-          <Text style={styles.subtitle}>{wishlistItems.length} items saved</Text>
+        {/* Category Header */}
+        <View style={styles.categoryHeader}>
+          <Text style={styles.categoryTitle}>Fashion Collection</Text>
+          <Text style={styles.categorySubtitle}>Discover the latest trends</Text>
         </View>
 
-        {/* Wishlist Items */}
-        <View style={styles.itemsContainer}>
+        {/* Products Grid */}
+        <View style={styles.productsContainer}>
           <FlatList
-            data={wishlistItems}
+            data={categoryProducts}
             renderItem={renderProductCard}
             keyExtractor={(item) => item.id}
             numColumns={2}
             scrollEnabled={false}
-            contentContainerStyle={styles.itemsGrid}
+            contentContainerStyle={styles.productsGrid}
           />
         </View>
+
+        {/* Bottom spacing */}
+        <View style={styles.bottomSpacing} />
       </ScrollView>
 
+      {/* Drawer - Reused from home screen */}
       <Drawer
         isVisible={isDrawerVisible}
         onClose={closeDrawer}
@@ -136,28 +141,31 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: 100, // Space for bottom tab bar
+    paddingBottom: 20,
   },
-  header: {
+  categoryHeader: {
     paddingHorizontal: 20,
     paddingVertical: 24,
     backgroundColor: '#23262F',
   },
-  title: {
+  categoryTitle: {
     fontSize: 24,
     fontWeight: '700',
     color: '#F4F4F4',
     marginBottom: 8,
   },
-  subtitle: {
+  categorySubtitle: {
     fontSize: 16,
     color: '#A0A0A0',
   },
-  itemsContainer: {
+  productsContainer: {
     backgroundColor: '#23262F',
     paddingVertical: 20,
   },
-  itemsGrid: {
+  productsGrid: {
     paddingHorizontal: 20,
+  },
+  bottomSpacing: {
+    height: 20,
   },
 }); 
