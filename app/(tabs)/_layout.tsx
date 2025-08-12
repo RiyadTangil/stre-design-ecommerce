@@ -52,13 +52,15 @@ export default function TabLayout() {
         <Stack.Screen name="index" />
         <Stack.Screen name="categories" />
         <Stack.Screen name="wishlist" />
-        <Stack.Screen name="profile" />
+        <Stack.Screen name="no" />
       </Stack>
       
-      <CustomBottomTabBar
-        activeTab={activeTab}
-        onTabPress={handleTabPress}
-      />
+      {!pathname.includes('product-details') && (
+        <CustomBottomTabBar
+          activeTab={activeTab}
+          onTabPress={handleTabPress}
+        />
+      )}
     </View>
   );
 }

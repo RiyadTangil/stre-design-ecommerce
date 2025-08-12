@@ -18,7 +18,7 @@ import { useDrawer } from '@/hooks/useDrawer';
 const categoryProducts = [
   {
     id: '1',
-    image: { uri: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop' },
+    image: { uri: 'https://images.unsplash.com/photo-1530389912609-9a007b3c38a4?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fHByb2R1Y3QlMjBzaG90fGVufDB8fDB8fHww' },
     title: 'Casual Shirt',
     price: '$45.00',
     originalPrice: '$50.15',

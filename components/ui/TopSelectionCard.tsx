@@ -2,27 +2,31 @@ import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { ImageWithFallback } from './ImageWithFallback';
 
-interface FeaturedCategoryCardProps {
+interface TopSelectionCardProps {
   image?: any;
   title: string;
   subtitle: string;
+  imageBackgroundColor?: string;
   onPress?: () => void;
 }
 
-export const FeaturedCategoryCard: React.FC<FeaturedCategoryCardProps> = ({
+export const TopSelectionCard: React.FC<TopSelectionCardProps> = ({
   image,
   title,
   subtitle,
+  imageBackgroundColor = '#E5E5E5',
   onPress,
 }) => {
   return (
     <Pressable style={styles.container} onPress={onPress}>
-      <ImageWithFallback
-        source={image}
-        style={styles.image}
-        resizeMode="cover"
-        fallbackColor="#f5f5f5"
-      />
+      <View style={[styles.imageContainer, { backgroundColor: imageBackgroundColor }]}>
+        <ImageWithFallback
+          source={image}
+          style={styles.image}
+          resizeMode="cover"
+          fallbackColor={imageBackgroundColor}
+        />
+      </View>
       <View style={styles.content}>
         <Text style={styles.title} numberOfLines={1}>{title}</Text>
         <Text style={styles.subtitle} numberOfLines={1}>{subtitle}</Text>
@@ -33,42 +37,46 @@ export const FeaturedCategoryCard: React.FC<FeaturedCategoryCardProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    width: 140,
     backgroundColor: '#23262F',
-    borderRadius: 12,
-    marginRight: 12,
-    borderWidth: 1,
-    borderColor: '#3A3F47',
+    borderRadius: 16,
+    overflow: 'hidden',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 2,
     },
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 3,
-    overflow: 'hidden',
+    elevation: 2,
+  },
+  imageContainer: {
+    height: 160,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 0,
   },
   image: {
     width: '100%',
-    height: 80,
-    borderTopLeftRadius: 12,
-    borderTopRightRadius: 12,
+    height: '100%',
+    resizeMode: 'cover',
   },
   content: {
-    padding: 12,
-   
+    backgroundColor: '#1A1A1A',
+    padding: 16,
+    paddingTop: 12,
+    paddingBottom: 12,
   },
   title: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: '600',
-    color: '#F4F4F4',
-    textAlign: 'center',
+    color: '#FFFFFF',
+ 
     marginBottom: 4,
   },
   subtitle: {
     fontSize: 12,
-    color: '#A0A0A0',
-    textAlign: 'center',
+    color: '#FFFFFF',
+    
+    opacity: 0.9,
   },
-}); 
+});

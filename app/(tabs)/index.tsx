@@ -1,13 +1,16 @@
 import { SafeAreaView } from '@/components/ui/SafeAreaProvider';
-import React, { useState } from 'react';
+import { router } from 'expo-router';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
+  Animated,
   FlatList,
   Pressable,
   ScrollView,
   StatusBar,
   StyleSheet,
   Text,
-  View
+  View,
+  ViewToken
 } from 'react-native';
 
 // Import our reusable components
@@ -19,7 +22,11 @@ import { ImageCarousel } from '@/components/ui/ImageCarousel';
 import { ProductCard } from '@/components/ui/ProductCard';
 import { ProductListItem } from '@/components/ui/ProductListItem';
 import { SaleTimer } from '@/components/ui/SaleTimer';
+import { SearchPage } from '@/components/ui/SearchPage';
+import { SearchResults } from '@/components/ui/SearchResults';
+import { TopSelectionCard } from '@/components/ui/TopSelectionCard';
 import { useDrawer } from '@/hooks/useDrawer';
+import { useSearch } from '@/hooks/useSearch';
 
 // Mock data for the app
 const categories = [
@@ -35,7 +42,7 @@ const categories = [
   },
   { 
     id: '3', 
-    image: { uri: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop' }, 
+    image: { uri: 'https://images.unsplash.com/photo-1530389912609-9a007b3c38a4?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fHByb2R1Y3QlMjBzaG90fGVufDB8fDB8fHww' }, 
     title: 'Fashion' 
   },
   { 
@@ -68,7 +75,7 @@ const categories = [
 const popularProducts = [
   {
     id: '1',
-    image: { uri: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop' },
+    image: { uri: 'https://images.unsplash.com/photo-1530389912609-9a007b3c38a4?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fHByb2R1Y3QlMjBzaG90fGVufDB8fDB8fHww' },
     title: 'Peter England casual',
     price: '$45.00',
     originalPrice: '$50.15',
@@ -190,35 +197,42 @@ const topSelection = [
     image: { uri: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=300&fit=crop' },
     title: 'Wired Earphones',
     subtitle: 'upto 50% off',
+    imageBackgroundColor: '#E5E5E5',
   },
   {
     id: '2',
     image: { uri: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=300&fit=crop' },
     title: 'Top Mobiles',
     subtitle: 'upto 50% off',
+    imageBackgroundColor: '#FFE5F0',
   },
   {
     id: '3',
     image: { uri: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=300&fit=crop' },
-    title: 'Cameras',
+    title: 'Headphones',
     subtitle: 'upto 50% off',
+    imageBackgroundColor: '#E5E5E5',
   },
   {
     id: '4',
     image: { uri: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400&h=300&fit=crop' },
     title: 'Best Laptops',
     subtitle: 'upto 50% off',
-  },
-  {
-    id: '5',
-    image: { uri: 'https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=400&h=300&fit=crop' },
-    title: 'Smartwatches',
-    subtitle: 'upto 50% off',
+    imageBackgroundColor: '#2A2A2A',
   },
 ];
 
 export default function HomeScreen() {
   const [cartCount, setCartCount] = useState(3);
+  const [currentPopularIndex, setCurrentPopularIndex] = useState(0);
+  const [currentFeaturedIndex, setCurrentFeaturedIndex] = useState(0);
+  const popularCarouselRef = useRef<FlatList>(null);
+  const featuredCarouselRef = useRef<FlatList>(null);
+  const popularScrollX = useRef(new Animated.Value(0)).current;
+  const featuredScrollX = useRef(new Animated.Value(0)).current;
+  const popularAutoPlayTimer = useRef<ReturnType<typeof setInterval> | null>(null);
+  const featuredAutoPlayTimer = useRef<ReturnType<typeof setInterval> | null>(null);
+  
   const {
     isDrawerVisible,
     openDrawer,
@@ -226,6 +240,20 @@ export default function HomeScreen() {
     handleCategoryPress,
     handleSubCategoryPress,
   } = useDrawer();
+
+  const {
+    isSearchVisible,
+    showResults,
+    searchQuery,
+    searchResults,
+    isSearching,
+    recentSearches,
+    openSearch,
+    closeSearch,
+    closeResults,
+    performSearch,
+    handleProductPress,
+  } = useSearch();
 
   const handleAddToCart = () => {
     setCartCount(prev => prev + 1);
@@ -240,8 +268,13 @@ export default function HomeScreen() {
     console.log('Home category pressed:', category.title);
   };
 
-  const handleProductPress = (product: any) => {
+  const handleHomeProductPress = (product: any) => {
     console.log('Product pressed:', product.title);
+    // Navigate to product details with product data
+    router.push({
+      pathname: '/product-details',
+      params: { productId: product.id }
+    });
   };
 
   const handleViewAll = (section: string) => {
@@ -252,14 +285,122 @@ export default function HomeScreen() {
     openDrawer();
   };
 
+  const handleSearchPress = () => {
+    openSearch();
+  };
+
+  // Infinite scrolling carousel for Popular section
+  const createInfiniteData = useCallback((data: any[]) => {
+    if (data.length === 0) return data;
+    // Create a longer array by repeating the data multiple times
+    const repeatedData = [];
+    for (let i = 0; i < 3; i++) {
+      repeatedData.push(...data.map((item, index) => ({
+        ...item,
+        id: `${item.id}_${i}`,
+        originalId: item.id,
+      })));
+    }
+    return repeatedData;
+  }, []);
+
+  const infinitePopularProducts = createInfiniteData(popularProducts);
+  const infiniteFeaturedCategories = createInfiniteData(featuredCategories);
+
+  const startPopularAutoPlay = useCallback(() => {
+    if (popularAutoPlayTimer.current) {
+      clearInterval(popularAutoPlayTimer.current);
+    }
+
+    popularAutoPlayTimer.current = setInterval(() => {
+      if (popularCarouselRef.current) {
+        const nextIndex = (currentPopularIndex + 1) % popularProducts.length;
+        const targetIndex = nextIndex + popularProducts.length; // Offset by one set
+        popularCarouselRef.current.scrollToIndex({
+          index: targetIndex,
+          animated: true,
+        });
+        setCurrentPopularIndex(nextIndex);
+      }
+    }, 3000); // Auto-scroll every 3 seconds
+  }, [currentPopularIndex, popularProducts.length]);
+
+  const stopPopularAutoPlay = useCallback(() => {
+    if (popularAutoPlayTimer.current) {
+      clearInterval(popularAutoPlayTimer.current);
+      popularAutoPlayTimer.current = null;
+    }
+  }, []);
+
+  // Auto-play for Featured Categories section
+  const startFeaturedAutoPlay = useCallback(() => {
+    if (featuredAutoPlayTimer.current) {
+      clearInterval(featuredAutoPlayTimer.current);
+    }
+
+    featuredAutoPlayTimer.current = setInterval(() => {
+      if (featuredCarouselRef.current) {
+        const nextIndex = (currentFeaturedIndex + 1) % featuredCategories.length;
+        const targetIndex = nextIndex + featuredCategories.length; // Offset by one set
+        featuredCarouselRef.current.scrollToIndex({
+          index: targetIndex,
+          animated: true,
+        });
+        setCurrentFeaturedIndex(nextIndex);
+      }
+    }, 4000); // Auto-scroll every 4 seconds (slightly slower than popular)
+  }, [currentFeaturedIndex, featuredCategories.length]);
+
+  const stopFeaturedAutoPlay = useCallback(() => {
+    if (featuredAutoPlayTimer.current) {
+      clearInterval(featuredAutoPlayTimer.current);
+      featuredAutoPlayTimer.current = null;
+    }
+  }, []);
+
+  useEffect(() => {
+    startPopularAutoPlay();
+    return () => stopPopularAutoPlay();
+  }, [startPopularAutoPlay, stopPopularAutoPlay]);
+
+  useEffect(() => {
+    startFeaturedAutoPlay();
+    return () => stopFeaturedAutoPlay();
+  }, [startFeaturedAutoPlay, stopFeaturedAutoPlay]);
+
+  const onPopularViewableItemsChanged = useRef(
+    ({ viewableItems }: { viewableItems: ViewToken[] }) => {
+      if (viewableItems.length > 0) {
+        const index = viewableItems[0].index || 0;
+        const actualIndex = index % popularProducts.length;
+        setCurrentPopularIndex(actualIndex);
+      }
+    }
+  ).current;
+
+  const onFeaturedViewableItemsChanged = useRef(
+    ({ viewableItems }: { viewableItems: ViewToken[] }) => {
+      if (viewableItems.length > 0) {
+        const index = viewableItems[0].index || 0;
+        const actualIndex = index % featuredCategories.length;
+        setCurrentFeaturedIndex(actualIndex);
+      }
+    }
+  ).current;
+
+  const viewabilityConfig = useRef({
+    itemVisiblePercentThreshold: 50,
+  }).current;
+
+ 
+
   const renderProductCard = ({ item }: { item: any }) => (
     <ProductCard
       image={item.image}
       title={item.title}
       price={item.price}
       originalPrice={item.originalPrice}
-      onPress={() => handleProductPress(item)}
-      onAddToCart={handleAddToCart}
+      onPress={() => handleHomeProductPress(item)}
     />
   );
 
@@ -273,10 +414,11 @@ export default function HomeScreen() {
   );
 
   const renderTopSelection = ({ item }: { item: any }) => (
-    <FeaturedCategoryCard
+    <TopSelectionCard
       image={item.image}
       title={item.title}
       subtitle={item.subtitle}
+      imageBackgroundColor={item.imageBackgroundColor}
       onPress={() => handleProductPress(item)}
     />
   );
@@ -305,7 +447,7 @@ export default function HomeScreen() {
         cartCount={cartCount}
         showLogo={true}
         onMenuPress={handleMenuPress}
-        onSearchPress={() => console.log('Search pressed')}
+        onSearchPress={handleSearchPress}
         onWishlistPress={() => console.log('Wishlist pressed')}
         onCartPress={() => console.log('Cart pressed')}
       />
@@ -356,26 +498,73 @@ export default function HomeScreen() {
               <Text style={styles.viewAllText}>View all {'>'}</Text>
             </Pressable>
           </View>
-          <FlatList
-            data={popularProducts}
-            renderItem={renderProductCard}
-            keyExtractor={(item) => item.id}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.horizontalList}
-          />
+          <View style={styles.carouselContainer}>
+            <FlatList
+              ref={popularCarouselRef}
+              data={infinitePopularProducts}
+              renderItem={renderProductCard}
+              keyExtractor={(item) => item.id}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.horizontalList}
+              onScroll={Animated.event(
+                [{ nativeEvent: { contentOffset: { x: popularScrollX } } }],
+                { useNativeDriver: false }
+              )}
+              onViewableItemsChanged={onPopularViewableItemsChanged}
+              viewabilityConfig={viewabilityConfig}
+              scrollEventThrottle={16}
+              decelerationRate={0.8}
+              snapToInterval={172} // 160 (card width) + 12 (margin)
+              snapToAlignment="start"
+              bounces={false}
+              overScrollMode="never"
+              onScrollBeginDrag={stopPopularAutoPlay}
+              onScrollEndDrag={startPopularAutoPlay}
+              onMomentumScrollEnd={(event) => {
+                const offsetX = event.nativeEvent.contentOffset.x;
+                const index = Math.round(offsetX / 172);
+                const actualIndex = index % popularProducts.length;
+                setCurrentPopularIndex(actualIndex);
+              }}
+                         />
+           </View>
         </View>
 
         {/* Featured Categories */}
-        <View style={styles.section}>
-          <FlatList
-            data={featuredCategories}
-            renderItem={renderFeaturedCategory}
-            keyExtractor={(item) => item.id}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.horizontalList}
-          />
+        <View style={[styles.section, styles.featuredCategoriesSection]}>
+          
+          <View style={styles.carouselContainer}>
+            <FlatList
+              ref={featuredCarouselRef}
+              data={infiniteFeaturedCategories}
+              renderItem={renderFeaturedCategory}
+              keyExtractor={(item) => item.id}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.horizontalList}
+              onScroll={Animated.event(
+                [{ nativeEvent: { contentOffset: { x: featuredScrollX } } }],
+                { useNativeDriver: false }
+              )}
+              onViewableItemsChanged={onFeaturedViewableItemsChanged}
+              viewabilityConfig={viewabilityConfig}
+              scrollEventThrottle={16}
+              decelerationRate={0.8}
+              snapToInterval={172} // 160 (card width) + 12 (margin)
+              snapToAlignment="start"
+              bounces={false}
+              overScrollMode="never"
+              onScrollBeginDrag={stopFeaturedAutoPlay}
+              onScrollEndDrag={startFeaturedAutoPlay}
+              onMomentumScrollEnd={(event) => {
+                const offsetX = event.nativeEvent.contentOffset.x;
+                const index = Math.round(offsetX / 172);
+                const actualIndex = index % featuredCategories.length;
+                setCurrentFeaturedIndex(actualIndex);
+              }}
+            />
+          </View>
         </View>
 
         {/* Popular Items */}
@@ -396,7 +585,7 @@ export default function HomeScreen() {
                 discount={item.discount}
                 originalPrice={item.originalPrice}
                 currentPrice={item.currentPrice}
-                onPress={() => handleProductPress(item)}
+                onPress={() => handleHomeProductPress(item)}
                 onAddToCart={handleAddToCart}
               />
             ))}
@@ -404,16 +593,19 @@ export default function HomeScreen() {
         </View>
 
         {/* Top Selection */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Top Selection</Text>
-          <FlatList
-            data={topSelection}
-            renderItem={renderTopSelection}
-            keyExtractor={(item) => item.id}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.horizontalList}
-          />
+        <View style={[styles.section, styles.topSelectionSection]}>
+
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Top Selection</Text>
+          </View>
+
+          <View style={styles.topSelectionGrid}>
+            {topSelection.map((item) => (
+              <View key={item.id} style={styles.topSelectionItem}>
+                {renderTopSelection({ item })}
+              </View>
+            ))}
+          </View>
         </View>
 
       </ScrollView>
@@ -425,6 +617,25 @@ export default function HomeScreen() {
         onCategoryPress={handleCategoryPress}
         onSubCategoryPress={handleSubCategoryPress}
       />
+
+      {/* Search Page */}
+      <SearchPage
+        isVisible={isSearchVisible}
+        onClose={closeSearch}
+        onSearch={performSearch}
+        recentSearches={recentSearches}
+      />
+
+      {/* Search Results */}
+      {showResults && (
+        <SearchResults
+          query={searchQuery}
+          results={searchResults}
+          loading={isSearching}
+          onProductPress={handleProductPress}
+          onBackToSearch={closeResults}
+        />
+      )}
     </SafeAreaView>
   );
 }
@@ -448,7 +659,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   section: {
-    backgroundColor: '#23262F',
+    // backgroundColor: '#23262F',
     marginTop: 12,
     paddingVertical: 20,
   },
@@ -473,5 +684,41 @@ const styles = StyleSheet.create({
   },
   popularItemsContainer: {
     paddingHorizontal: 20,
+  },
+  carouselContainer: {
+    position: 'relative',
+    marginBottom: 20,
+  },
+  paginationContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 16,
+    paddingHorizontal: 20,
+  },
+  paginationDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginHorizontal: 4,
+  },
+  featuredCategoriesSection: {
+    borderTopWidth: 1,
+    borderTopColor: '#2A2D35',
+    borderBottomWidth: 1,
+    borderBottomColor: '#2A2D35',
+  },
+  topSelectionSection: {
+    backgroundColor: '#2F2F2F',
+  },
+  topSelectionGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+  },
+  topSelectionItem: {
+    width: '48%',
+    marginBottom: 20,
   },
 });

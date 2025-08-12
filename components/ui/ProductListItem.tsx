@@ -35,8 +35,8 @@ export const ProductListItem: React.FC<ProductListItemProps> = ({
       <View style={styles.content}>
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.description}>{description}</Text>
-        <Text style={styles.discount}>{discount}</Text>
         <View style={styles.priceContainer}>
+          <Text style={styles.discount}>{discount}</Text>
           <Text style={styles.originalPrice}>{originalPrice}</Text>
           <Text style={styles.currentPrice}>{currentPrice}</Text>
         </View>
@@ -51,12 +51,11 @@ export const ProductListItem: React.FC<ProductListItemProps> = ({
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    alignItems: 'center',
     paddingVertical: 16,
-    paddingHorizontal: 20,
+    // paddingHorizontal: 20,
     borderBottomWidth: 1,
     borderBottomColor: '#23262F',
-    backgroundColor: '#23262F',
+    // backgroundColor: '#23262F',
   },
   image: {
     width: 60,
@@ -65,21 +64,22 @@ const styles = StyleSheet.create({
     marginRight: 16,
   },
   content: {
+    marginLeft: 5,
     flex: 1,
   },
   title: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '600',
     color: '#F4F4F4',
     marginBottom: 4,
   },
   description: {
-    fontSize: 14,
-    color: '#A0A0A0',
-    marginBottom: 4,
+    fontSize: 12,
+    color: '#FF6B9D',
+    marginBottom: 10,
   },
   discount: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#4CAF50',
     fontWeight: '600',
     marginBottom: 4,
@@ -90,12 +90,12 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   originalPrice: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#A0A0A0',
     textDecorationLine: 'line-through',
   },
   currentPrice: {
-    fontSize: 16,
+    fontSize: 12,
     fontWeight: '700',
     color: '#F4F4F4',
   },
@@ -106,5 +106,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#FF6B9D',
     justifyContent: 'center',
     alignItems: 'center',
+    alignSelf: 'flex-end',
   },
 }); 

@@ -1,128 +1,298 @@
 import { SafeAreaView } from '@/components/ui/SafeAreaProvider';
-import React, { useState } from 'react';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import * as Haptics from 'expo-haptics';
+import { router } from 'expo-router';
+import React, { useRef, useState } from 'react';
 import {
+  Animated,
   FlatList,
-  ScrollView,
+  Pressable,
   StatusBar,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View
 } from 'react-native';
 
-import { AppHeader } from '@/components/ui/AppHeader';
-import { Drawer } from '@/components/ui/Drawer';
-import { ProductCard } from '@/components/ui/ProductCard';
-import { useDrawer } from '@/hooks/useDrawer';
+import { ImageWithFallback } from '@/components/ui/ImageWithFallback';
 
-// Mock data for wishlist items
+// Mock data for wishlist items based on the image
 const wishlistItems = [
   {
     id: '1',
-    image: { uri: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop' },
-    title: 'Casual Shirt',
-    price: '$45.00',
-    originalPrice: '$50.15',
+    image: { uri: 'https://images.unsplash.com/photo-1530389912609-9a007b3c38a4?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fHByb2R1Y3QlMjBzaG90fGVufDB8fDB8fHww' },
+    category: 'Jacket',
+    title: 'Men Black Grey Allover Printed Round Neck ...',
+    currentPrice: '$25.15',
+    originalPrice: '$30.15',
+    isWishlisted: true,
   },
   {
     id: '2',
     image: { uri: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400&h=400&fit=crop' },
-    title: 'Track Jacket',
-    price: '$23.12',
+    category: 'T-Shirt',
+    title: 'Pink Winter Sweater and Jacket with Cap',
+    currentPrice: '$25.15',
     originalPrice: '$30.15',
+    isWishlisted: true,
   },
   {
     id: '3',
     image: { uri: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop' },
-    title: 'Running Shoes',
-    price: '$155.00',
-    originalPrice: '$200.00',
+    category: 'T-Shirt',
+    title: 'Men Black Grey Allover Printed Round Neck ...',
+    currentPrice: '$25.15',
+    originalPrice: '$30.15',
+    isWishlisted: true,
   },
   {
     id: '4',
     image: { uri: 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=400&h=400&fit=crop' },
-    title: 'Sports Bag',
-    price: '$89.99',
-    originalPrice: '$120.00',
+    category: 'Jacket',
+    title: 'Pink Winter Sweater and Jacket with Cap',
+    currentPrice: '$25.15',
+    originalPrice: '$30.15',
+    isWishlisted: false,
   },
 ];
 
-export default function WishlistScreen() {
-  const [cartCount, setCartCount] = useState(1);
-  const {
-    isDrawerVisible,
-    openDrawer,
-    closeDrawer,
-    handleCategoryPress,
-    handleSubCategoryPress,
-  } = useDrawer();
+// Wishlist Item Component
+const WishlistItem = ({ item, onToggleWishlist, onPress, viewMode }: {
+  item: any;
+  onToggleWishlist: (id: string) => void;
+  onPress: (item: any) => void;
+  viewMode: 'list' | 'grid';
+}) => {
+  const scaleAnim = useRef(new Animated.Value(1)).current;
 
-  const handleMenuPress = () => {
-    openDrawer();
+  const animateHeart = () => {
+    Animated.sequence([
+      Animated.timing(scaleAnim, {
+        toValue: 1.2,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(scaleAnim, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+    ]).start();
   };
 
-  const handleAddToCart = () => {
-    setCartCount(prev => prev + 1);
+  const handleHeartPress = () => {
+    animateHeart();
+    onToggleWishlist(item.id);
+  };
+  if (viewMode === 'grid') {
+    return (
+      <Pressable style={styles.wishlistItemGrid} onPress={() => onPress(item)}>
+        <View style={styles.imageWrapperGrid}>
+          <ImageWithFallback
+            source={item.image}
+            style={styles.productImageGrid}
+            resizeMode="cover"
+            fallbackColor="#3A3F47"
+          />
+          <Animated.View style={[styles.heartButtonGrid, { transform: [{ scale: scaleAnim }] }]}>
+            <TouchableOpacity
+              onPress={handleHeartPress}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <MaterialIcons
+                name={item.isWishlisted ? 'favorite' : 'favorite-border'}
+                size={16}
+                color="#FF6B9D"
+              />
+            </TouchableOpacity>
+          </Animated.View>
+        </View>
+        <View style={styles.detailsContainerGrid}>
+          <Text style={styles.categoryTextGrid}>{item.category}</Text>
+          <Text style={styles.titleTextGrid} numberOfLines={2}>
+            {item.title}
+          </Text>
+          <View style={styles.priceContainerGrid}>
+            <Text style={styles.currentPriceGrid}>{item.currentPrice}</Text>
+            <Text style={styles.originalPriceGrid}>{item.originalPrice}</Text>
+          </View>
+        </View>
+      </Pressable>
+    );
+  }
+
+  return (
+    <Pressable style={styles.wishlistItem} onPress={() => onPress(item)}>
+      {/* Left Section - Image with Heart Icon */}
+      <View style={styles.imageContainer}>
+        <View style={styles.imageWrapper}>
+          <ImageWithFallback
+            source={item.image}
+            style={styles.productImage}
+            resizeMode="cover"
+            fallbackColor="#3A3F47"
+          />
+          <Animated.View style={[styles.heartButton, { transform: [{ scale: scaleAnim }] }]}>
+            <TouchableOpacity
+              onPress={handleHeartPress}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <MaterialIcons
+                name={item.isWishlisted ? 'favorite' : 'favorite-border'}
+                size={16}
+                color="#FF6B9D"
+              />
+            </TouchableOpacity>
+          </Animated.View>
+        </View>
+      </View>
+
+      {/* Right Section - Product Details */}
+      <View style={styles.detailsContainer}>
+        <Text style={styles.categoryText}>{item.category}</Text>
+        <Text style={styles.titleText} numberOfLines={2}>
+          {item.title}
+        </Text>
+        <View style={styles.priceContainer}>
+          <Text style={styles.currentPrice}>{item.currentPrice}</Text>
+          <Text style={styles.originalPrice}>{item.originalPrice}</Text>
+        </View>
+      </View>
+    </Pressable>
+  );
+};
+
+export default function WishlistScreen() {
+  const [wishlistData, setWishlistData] = useState(wishlistItems);
+  const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
+  const listButtonScale = useRef(new Animated.Value(1)).current;
+  const gridButtonScale = useRef(new Animated.Value(1)).current;
+  const backButtonScale = useRef(new Animated.Value(1)).current;
+
+  const handleBackPress = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    
+    Animated.sequence([
+      Animated.timing(backButtonScale, {
+        toValue: 0.9,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(backButtonScale, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+    ]).start();
+    
+    router.back();
+  };
+
+  const handleToggleWishlist = (id: string) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setWishlistData(prev => 
+      prev.map(item => 
+        item.id === id 
+          ? { ...item, isWishlisted: !item.isWishlisted }
+          : item
+      )
+    );
   };
 
   const handleProductPress = (product: any) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     console.log('Product pressed:', product.title);
   };
 
-  const renderProductCard = ({ item }: { item: any }) => (
-    <ProductCard
-      image={item.image}
-      title={item.title}
-      price={item.price}
-      originalPrice={item.originalPrice}
-      onPress={() => handleProductPress(item)}
-      onAddToCart={handleAddToCart}
+  const handleViewModeToggle = (mode: 'list' | 'grid') => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    
+    const buttonScale = mode === 'list' ? listButtonScale : gridButtonScale;
+    
+    Animated.sequence([
+      Animated.timing(buttonScale, {
+        toValue: 0.9,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(buttonScale, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+    ]).start();
+    
+    setViewMode(mode);
+  };
+
+  const renderWishlistItem = ({ item }: { item: any }) => (
+    <WishlistItem
+      item={item}
+      onToggleWishlist={handleToggleWishlist}
+      onPress={handleProductPress}
+      viewMode={viewMode}
     />
   );
 
   return (
     <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
-      <StatusBar barStyle="light-content" backgroundColor="#181A20" />
+      <StatusBar barStyle="light-content" backgroundColor="#1A1C20" />
       
-      <AppHeader
-        title="Wishlist"
-        cartCount={cartCount}
-        showLogo={false}
-        onMenuPress={handleMenuPress}
-        onSearchPress={() => console.log('Search pressed')}
-        onWishlistPress={() => console.log('Wishlist pressed')}
-        onCartPress={() => console.log('Cart pressed')}
-      />
+      {/* Custom Header */}
+      <View style={styles.header}>
+        <Animated.View style={{ transform: [{ scale: backButtonScale }] }}>
+          <TouchableOpacity style={styles.backButton} onPress={handleBackPress}>
+            <MaterialIcons name="chevron-left" size={24} color="#FFFFFF" />
+          </TouchableOpacity>
+        </Animated.View>
+        
+        <Text style={styles.headerTitle}>Wishlist</Text>
+        
+        <View style={styles.headerActions}>
+          <Animated.View style={{ transform: [{ scale: listButtonScale }] }}>
+            <TouchableOpacity 
+              style={[styles.viewModeButton, viewMode === 'list' && styles.viewModeButtonActive]}
+              onPress={() => handleViewModeToggle('list')}
+            >
+              <MaterialIcons 
+                name="view-list" 
+                size={20} 
+                color={viewMode === 'list' ? '#FFFFFF' : '#9B9B9B'} 
+              />
+            </TouchableOpacity>
+          </Animated.View>
+          
+          <Animated.View style={{ transform: [{ scale: gridButtonScale }] }}>
+            <TouchableOpacity 
+              style={[styles.viewModeButton, viewMode === 'grid' && styles.viewModeButtonActive]}
+              onPress={() => handleViewModeToggle('grid')}
+            >
+              <MaterialIcons 
+                name="grid-view" 
+                size={20} 
+                color={viewMode === 'grid' ? '#FFFFFF' : '#9B9B9B'} 
+              />
+            </TouchableOpacity>
+          </Animated.View>
+        </View>
+      </View>
 
-      <ScrollView
-        style={styles.scrollView}
+      {/* Wishlist Items */}
+      <FlatList
+        key={viewMode} // Force re-render when view mode changes
+        data={wishlistData}
+        renderItem={renderWishlistItem}
+        keyExtractor={(item) => item.id}
+        style={styles.wishlistContainer}
+        contentContainerStyle={[
+          styles.wishlistContent,
+          viewMode === 'grid' && styles.wishlistContentGrid
+        ]}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-      >
-        {/* Wishlist Header */}
-        <View style={styles.header}>
-          <Text style={styles.title}>My Wishlist</Text>
-          <Text style={styles.subtitle}>{wishlistItems.length} items saved</Text>
-        </View>
-
-        {/* Wishlist Items */}
-        <View style={styles.itemsContainer}>
-          <FlatList
-            data={wishlistItems}
-            renderItem={renderProductCard}
-            keyExtractor={(item) => item.id}
-            numColumns={2}
-            scrollEnabled={false}
-            contentContainerStyle={styles.itemsGrid}
-          />
-        </View>
-      </ScrollView>
-
-      <Drawer
-        isVisible={isDrawerVisible}
-        onClose={closeDrawer}
-        onCategoryPress={handleCategoryPress}
-        onSubCategoryPress={handleSubCategoryPress}
+        numColumns={viewMode === 'grid' ? 2 : 1}
+        columnWrapperStyle={viewMode === 'grid' ? styles.gridRow : undefined}
       />
+
     </SafeAreaView>
   );
 }
@@ -130,34 +300,191 @@ export default function WishlistScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#181A20',
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingBottom: 100, // Space for bottom tab bar
+    backgroundColor: '#1A1C20',
   },
   header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingVertical: 24,
-    backgroundColor: '#23262F',
+    paddingVertical: 16,
+    backgroundColor: '#1A1C20',
+    borderBottomWidth: 1,
+    borderBottomColor: '#2A2D36',
   },
-  title: {
-    fontSize: 24,
+  backButton: {
+    padding: 8,
+  },
+  headerTitle: {
+    fontSize: 20,
     fontWeight: '700',
-    color: '#F4F4F4',
+    color: '#FFFFFF',
+  },
+  headerActions: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  viewModeButton: {
+    padding: 8,
+    borderRadius: 8,
+  },
+  viewModeButtonActive: {
+    backgroundColor: '#2A2D36',
+  },
+  wishlistContainer: {
+    flex: 1,
+  },
+  wishlistContent: {
+    paddingVertical: 16,
+  },
+  wishlistContentGrid: {
+    paddingHorizontal: 10,
+  },
+  gridRow: {
+    justifyContent: 'space-between',
+  },
+  wishlistItem: {
+    flexDirection: 'row',
+    backgroundColor: '#23262F',
+    marginHorizontal: 20,
+    marginBottom: 16,
+    borderRadius: 12,
+    
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  imageContainer: {
+    width: 100,
+    height: 100,
+  },
+  imageWrapper: {
+    position: 'relative',
+  },
+  productImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 16,
+  },
+  heartButton: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    width: 24,
+    height: 24,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#FF6B9D',
+  },
+  detailsContainer: {
+    flex: 1,
+    marginLeft: 16,
+  },
+  categoryText: {
+    fontSize: 10,
+    color: '#9B9B9B',
+   
+    marginTop: 4,
+  },
+  titleText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    lineHeight: 20,
+    
+  },
+  priceContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    
+    gap: 8,
+  },
+  currentPrice: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+  originalPrice: {
+    fontSize: 12,
+    color: '#9B9B9B',
+    textDecorationLine: 'line-through',
+  },
+  // Grid View Styles
+  wishlistItemGrid: {
+    backgroundColor: '#23262F',
+    marginBottom: 16,
+    borderRadius: 12,
+    padding: 12,
+    flex: 1,
+    marginHorizontal: 5,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  imageWrapperGrid: {
+    position: 'relative',
+    marginBottom: 12,
+  },
+  productImageGrid: {
+    width: '100%',
+    height: 120,
+    borderRadius: 8,
+  },
+  heartButtonGrid: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    width: 24,
+    height: 24,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#FF6B9D',
+  },
+  detailsContainerGrid: {
+    flex: 1,
+  },
+  categoryTextGrid: {
+    fontSize: 11,
+    color: '#9B9B9B',
+    marginBottom: 4,
+  },
+  titleTextGrid: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    lineHeight: 16,
     marginBottom: 8,
   },
-  subtitle: {
-    fontSize: 16,
-    color: '#A0A0A0',
+  priceContainerGrid: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
-  itemsContainer: {
-    backgroundColor: '#23262F',
-    paddingVertical: 20,
+  currentPriceGrid: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#FFFFFF',
   },
-  itemsGrid: {
-    paddingHorizontal: 20,
+  originalPriceGrid: {
+    fontSize: 12,
+    color: '#9B9B9B',
+    textDecorationLine: 'line-through',
   },
 }); 

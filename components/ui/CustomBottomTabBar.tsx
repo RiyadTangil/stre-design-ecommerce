@@ -70,7 +70,7 @@ export const CustomBottomTabBar: React.FC<CustomBottomTabBarProps> = ({
             <View style={styles.iconContainer}>
               <Ionicons
                 name={iconName as any}
-                size={24}
+                size={20}
                 color={isActive ? '#FF6B9D' : '#A0A0A0'}
               />
             </View>
@@ -113,12 +113,13 @@ const styles = StyleSheet.create({
   activeIndicator: {
     position: 'absolute',
     top: 0,
-    left: '50%',
+    left: '30%',
     marginLeft: -15,
-    width: 30,
-    height: 3,
+    width: 70,
+    height: 6,
     backgroundColor: '#FF6B9D',
-    borderRadius: 2,
+    borderBottomEndRadius: 16,
+    borderBottomStartRadius: 16,
   },
   iconContainer: {
     marginBottom: 4,
@@ -126,7 +127,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   tabLabel: {
-    fontSize: 12,
+    fontSize: 8,
     fontWeight: '500',
     textAlign: 'center',
   },
