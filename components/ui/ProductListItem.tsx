@@ -1,7 +1,7 @@
-import { Ionicons } from '@expo/vector-icons';
-import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { ImageWithFallback } from './ImageWithFallback';
+import { Ionicons } from "@expo/vector-icons";
+import React from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+import { ImageWithFallback } from "./ImageWithFallback";
 
 interface ProductListItemProps {
   image?: any;
@@ -50,12 +50,14 @@ export const ProductListItem: React.FC<ProductListItemProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
+    flexDirection: "row",
     paddingVertical: 16,
-    // paddingHorizontal: 20,
+    paddingHorizontal: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#23262F',
-    // backgroundColor: '#23262F',
+    marginBottom: 10,
+    borderRadius: 16,
+    // borderBottomColor: '#23262F',
+    backgroundColor: "#23262F",
   },
   image: {
     width: 60,
@@ -69,43 +71,43 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#F4F4F4',
+    fontWeight: "600",
+    color: "#F4F4F4",
     marginBottom: 4,
   },
   description: {
     fontSize: 12,
-    color: '#FF6B9D',
+    color: "#FF6B9D",
     marginBottom: 10,
   },
   discount: {
     fontSize: 12,
-    color: '#4CAF50',
-    fontWeight: '600',
+    color: "#4CAF50",
+    fontWeight: "600",
     marginBottom: 4,
   },
   priceContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
   },
   originalPrice: {
     fontSize: 12,
-    color: '#A0A0A0',
-    textDecorationLine: 'line-through',
+    color: "#A0A0A0",
+    textDecorationLine: "line-through",
   },
   currentPrice: {
     fontSize: 12,
-    fontWeight: '700',
-    color: '#F4F4F4',
+    fontWeight: "700",
+    color: "#F4F4F4",
   },
   addToCartButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#FF6B9D',
-    justifyContent: 'center',
-    alignItems: 'center',
-    alignSelf: 'flex-end',
+    backgroundColor: "#FF6B9D",
+    justifyContent: "center",
+    alignItems: "center",
+    alignSelf: "flex-end",
   },
-}); 
+});

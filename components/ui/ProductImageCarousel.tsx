@@ -3,11 +3,10 @@ import React, { useRef, useState } from 'react';
 import {
   Dimensions,
   FlatList,
-  Pressable,
   StyleSheet,
   View,
 } from 'react-native';
-import { ImageWithFallback } from './ImageWithFallback';
+import { ZoomableImage } from './ZoomableImage';
 
 interface ProductImageCarouselProps {
   images: { id: string; uri: string }[];
@@ -20,27 +19,18 @@ const { width: screenWidth } = Dimensions.get('window');
 export const ProductImageCarousel: React.FC<ProductImageCarouselProps> = ({
   images,
   height = 300,
-  onImagePress,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const flatListRef = useRef<FlatList>(null);
 
-  const handleImagePress = (index: number) => {
-    onImagePress?.(index);
-  };
-
   const renderImage = ({ item, index }: { item: any; index: number }) => (
-    <Pressable
-      style={[styles.imageContainer, { height }]}
-      onPress={() => handleImagePress(index)}
-    >
-      <ImageWithFallback
-        source={{ uri: item.uri }}
-        style={styles.image}
-        resizeMode="cover"
+    <View style={[styles.imageContainer, { height }]}>
+      <ZoomableImage
+        uri={item.uri}
+        height={height}
         fallbackColor={Colors.product.veryLightGrey}
       />
-    </Pressable>
+    </View>
   );
 
   const renderPaginationDots = () => (
@@ -81,11 +71,9 @@ export const ProductImageCarousel: React.FC<ProductImageCarouselProps> = ({
         showsHorizontalScrollIndicator={false}
         onScroll={handleScroll}
         scrollEventThrottle={16}
-        decelerationRate={0.8}
+        decelerationRate="fast"
         snapToInterval={screenWidth}
         snapToAlignment="center"
-        bounces={false}
-        overScrollMode="never"
       />
       {renderPaginationDots()}
     </View>

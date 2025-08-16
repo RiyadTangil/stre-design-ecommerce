@@ -1,14 +1,18 @@
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+
+// Import our reusable components
 import { SafeAreaView } from "@/components/ui/SafeAreaProvider";
 import { Colors } from "@/constants/Colors";
 import { LinearGradient } from "expo-linear-gradient";
 import { router, useLocalSearchParams } from "expo-router";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { ScrollView, StatusBar, StyleSheet, Text, View } from "react-native";
 
 // Import our reusable components
 import { AddToCartButton } from "@/components/ui/AddToCartButton";
 import { CategoryTag } from "@/components/ui/CategoryTag";
 import { ColorSwatch } from "@/components/ui/ColorSwatch";
+import { Loader } from '@/components/ui/Loader';
 import { ProductDetailsHeader } from "@/components/ui/ProductDetailsHeader";
 import { ProductImageCarousel } from "@/components/ui/ProductImageCarousel";
 import { RatingDisplay } from "@/components/ui/RatingDisplay";
@@ -43,8 +47,8 @@ const productDatabase: Record<string, ProductData> = {
     category: "Fashion",
     rating: 4.5,
     reviewCount: 2600,
-    currentPrice: "$45.00",
-    originalPrice: "$50.15",
+    currentPrice: "৳45.00",
+    originalPrice: "৳50.15",
     discountPercentage: 10,
     brand: "Peter England",
     weight: "200grm",
@@ -59,7 +63,7 @@ const productDatabase: Record<string, ProductData> = {
     images: [
       {
         id: "1",
-        uri: "https://images.unsplash.com/photo-1530389912609-9a007b3c38a4?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fHByb2R1Y3QlMjBzaG90fGVufDB8fDB8fHww",
+        uri: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cHJvZHVjdHxlbnwwfHwwfHx8MA%3D%3D",
       },
       {
         id: "2",
@@ -79,8 +83,8 @@ const productDatabase: Record<string, ProductData> = {
     category: "Sports",
     rating: 4.3,
     reviewCount: 1200,
-    currentPrice: "$23.12",
-    originalPrice: "$30.15",
+    currentPrice: "৳23.12",
+    originalPrice: "৳30.15",
     discountPercentage: 23,
     brand: "Sports Brand",
     weight: "350grm",
@@ -110,8 +114,8 @@ const productDatabase: Record<string, ProductData> = {
     category: "Luxury",
     rating: 4.8,
     reviewCount: 850,
-    currentPrice: "$155.00",
-    originalPrice: "$200.00",
+    currentPrice: "৳155.00",
+    originalPrice: "৳200.00",
     discountPercentage: 22,
     brand: "Louis V",
     weight: "500grm",
@@ -141,8 +145,8 @@ const productDatabase: Record<string, ProductData> = {
     category: "Footwear",
     rating: 4.6,
     reviewCount: 3200,
-    currentPrice: "$89.99",
-    originalPrice: "$120.00",
+    currentPrice: "৳89.99",
+    originalPrice: "৳120.00",
     discountPercentage: 25,
     brand: "Nike",
     weight: "400grm",
@@ -173,8 +177,8 @@ const productDatabase: Record<string, ProductData> = {
     category: "Footwear",
     rating: 4.7,
     reviewCount: 2100,
-    currentPrice: "$129.99",
-    originalPrice: "$180.00",
+    currentPrice: "৳129.99",
+    originalPrice: "৳180.00",
     discountPercentage: 28,
     brand: "Adidas",
     weight: "350grm",
@@ -192,17 +196,26 @@ const productDatabase: Record<string, ProductData> = {
       },
       {
         id: "2",
-        uri: "https://images.unsplash.com/photo-1530389912609-9a007b3c38a4?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fHByb2R1Y3QlMjBzaG90fGVufDB8fDB8fHww",
+        uri: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cHJvZHVjdHxlbnwwfHwwfHx8MA%3D%3D",
       },
     ],
   },
 };
 
 export default function ProductDetailsScreen() {
+  const [isLoading, setIsLoading] = useState(true);
   const { productId } = useLocalSearchParams<{ productId: string }>();
 
   // Get product data from database
   const productData = productDatabase[productId || "1"] || productDatabase["1"];
+
+  useEffect(() => {
+    // Simulate loading product data
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, []);
 
   const {
     selectedColor,
@@ -233,24 +246,23 @@ export default function ProductDetailsScreen() {
     [getDiscountAmount]
   );
 
-  // Show loading if product not found (in a real app, you'd show a proper loading state)
-  if (!productData) {
+  if (isLoading || !productData) {
     return (
       <SafeAreaView style={styles.container} edges={["left", "right"]}>
-        <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>Loading product...</Text>
-        </View>
+        <StatusBar barStyle="light-content" backgroundColor="#181A20" translucent />
+        <Loader fullscreen message="Loading Product Details..." />
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={["left", "right"]}>
-      <StatusBar
-        barStyle="light-content"
-        backgroundColor="#181A20"
-        translucent
-      />
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaView style={styles.container} edges={["left", "right"]}>
+        <StatusBar
+          barStyle="light-content"
+          backgroundColor="#181A20"
+          translucent
+        />
 
       {/* Header */}
       <ProductDetailsHeader
@@ -364,6 +376,7 @@ export default function ProductDetailsScreen() {
         <AddToCartButton onPress={handleAddToCart} loading={isAddingToCart} />
       </View>
     </SafeAreaView>
+    </GestureHandlerRootView>
   );
 }
 

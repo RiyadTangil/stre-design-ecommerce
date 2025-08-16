@@ -12,6 +12,7 @@ import {
     TouchableWithoutFeedback,
     View,
 } from 'react-native';
+import { Loader } from './Loader';
 import { SearchSuggestions } from './SearchSuggestions';
 
 interface SearchPageProps {
@@ -27,6 +28,7 @@ export const SearchPage: React.FC<SearchPageProps> = memo(({
     onSearch,
     recentSearches = [],
 }) => {
+    const [isLoading, setIsLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
     const slideAnim = useRef(new Animated.Value(-1000)).current;
     const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -34,6 +36,11 @@ export const SearchPage: React.FC<SearchPageProps> = memo(({
 
     useEffect(() => {
         if (isVisible) {
+            // Simulate loading time
+            const timer = setTimeout(() => {
+                setIsLoading(false);
+            }, 1000);
+
             // Slide in animation
             Animated.parallel([
                 Animated.timing(slideAnim, {
@@ -48,10 +55,8 @@ export const SearchPage: React.FC<SearchPageProps> = memo(({
                 }),
             ]).start();
 
-            // Focus search input after animation
-            setTimeout(() => {
-                searchInputRef.current?.focus();
-            }, 350);
+            return () => clearTimeout(timer);
+
         } else {
             // Slide out animation
             Animated.parallel([
@@ -114,14 +119,19 @@ export const SearchPage: React.FC<SearchPageProps> = memo(({
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <Animated.View style={[styles.overlay, { opacity: fadeAnim }]}>
-                <Animated.View
-                    style={[
-                        styles.container,
-                        {
-                            transform: [{ translateY: slideAnim }],
-                        },
-                    ]}
-                >
+                {isLoading ? (
+                    <View style={styles.container}>
+                        <Loader fullscreen message="Loading Search..." />
+                    </View>
+                ) : (
+                    <Animated.View
+                        style={[
+                            styles.container,
+                            {
+                                transform: [{ translateY: slideAnim }],
+                            },
+                        ]}
+                    >
                     <SafeAreaView style={styles.safeArea}>
                         {/* Search Input */}
                         <View style={styles.searchContainer}>
@@ -176,7 +186,8 @@ export const SearchPage: React.FC<SearchPageProps> = memo(({
                             </Pressable>
                         </View>
                     </SafeAreaView>
-                </Animated.View>
+                    </Animated.View>
+                )}
             </Animated.View>
         </TouchableWithoutFeedback>
     );

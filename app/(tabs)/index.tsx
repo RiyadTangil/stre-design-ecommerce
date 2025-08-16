@@ -1,6 +1,8 @@
-import { SafeAreaView } from '@/components/ui/SafeAreaProvider';
-import { router } from 'expo-router';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Loader } from "@/components/ui/Loader";
+import { SafeAreaView } from "@/components/ui/SafeAreaProvider";
+import { router } from "expo-router";
+import { useNavigation } from "@react-navigation/native";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Animated,
   FlatList,
@@ -10,229 +12,296 @@ import {
   StyleSheet,
   Text,
   View,
-  ViewToken
-} from 'react-native';
+  ViewToken,
+} from "react-native";
 
 // Import our reusable components
-import { AppHeader } from '@/components/ui/AppHeader';
-import { CategoryCard } from '@/components/ui/CategoryCard';
-import { Drawer } from '@/components/ui/Drawer';
-import { FeaturedCategoryCard } from '@/components/ui/FeaturedCategoryCard';
-import { ImageCarousel } from '@/components/ui/ImageCarousel';
-import { ProductCard } from '@/components/ui/ProductCard';
-import { ProductListItem } from '@/components/ui/ProductListItem';
-import { SaleTimer } from '@/components/ui/SaleTimer';
-import { SearchPage } from '@/components/ui/SearchPage';
-import { SearchResults } from '@/components/ui/SearchResults';
-import { TopSelectionCard } from '@/components/ui/TopSelectionCard';
-import { useDrawer } from '@/hooks/useDrawer';
-import { useSearch } from '@/hooks/useSearch';
+import { AppHeader } from "@/components/ui/AppHeader";
+import { CategoryCard } from "@/components/ui/CategoryCard";
+import { Drawer } from "@/components/ui/Drawer";
+import { FeaturedCategoryCard } from "@/components/ui/FeaturedCategoryCard";
+import { ImageCarousel } from "@/components/ui/ImageCarousel";
+import { ProductCard } from "@/components/ui/ProductCard";
+import { ProductListItem } from "@/components/ui/ProductListItem";
+import { SaleTimer } from "@/components/ui/SaleTimer";
+import { SearchPage } from "@/components/ui/SearchPage";
+import { SearchResults } from "@/components/ui/SearchResults";
+import { TopSelectionCard } from "@/components/ui/TopSelectionCard";
+import { useDrawer } from "@/hooks/useDrawer";
+import { useSearch } from "@/hooks/useSearch";
 
 // Mock data for the app
 const categories = [
-  { 
-    id: '1', 
-    image: { uri: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=200&h=200&fit=crop' }, 
-    title: 'Mobiles' 
+  {
+    id: "1",
+    image: {
+      uri: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=200&h=200&fit=crop",
+    },
+    title: "Mobiles",
   },
-  { 
-    id: '2', 
-    image: { uri: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=200&h=200&fit=crop' }, 
-    title: 'Electronics' 
+  {
+    id: "2",
+    image: {
+      uri: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=200&h=200&fit=crop",
+    },
+    title: "Electronics",
   },
-  { 
-    id: '3', 
-    image: { uri: 'https://images.unsplash.com/photo-1530389912609-9a007b3c38a4?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fHByb2R1Y3QlMjBzaG90fGVufDB8fDB8fHww' }, 
-    title: 'Fashion' 
+  {
+    id: "3",
+    image: {
+      uri: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cHJvZHVjdHxlbnwwfHwwfHx8MA%3D%3D",
+    },
+    title: "Fashion",
   },
-  { 
-    id: '4', 
-    image: { uri: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=200&h=200&fit=crop' }, 
-    title: 'Furniture' 
+  {
+    id: "4",
+    image: {
+      uri: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=200&h=200&fit=crop",
+    },
+    title: "Furniture",
   },
-  { 
-    id: '5', 
-    image: { uri: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=200&h=200&fit=crop' }, 
-    title: 'Grocery' 
+  {
+    id: "5",
+    image: {
+      uri: "https://images.unsplash.com/photo-1542838132-92c53300491e?w=200&h=200&fit=crop",
+    },
+    title: "Grocery",
   },
-  { 
-    id: '6', 
-    image: { uri: 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=200&h=200&fit=crop' }, 
-    title: 'Appliances' 
+  {
+    id: "6",
+    image: {
+      uri: "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=200&h=200&fit=crop",
+    },
+    title: "Appliances",
   },
-  { 
-    id: '7', 
-    image: { uri: 'https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?w=200&h=200&fit=crop' }, 
-    title: 'Toys' 
+  {
+    id: "7",
+    image: {
+      uri: "https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?w=200&h=200&fit=crop",
+    },
+    title: "Toys",
   },
-  { 
-    id: '8', 
-    image: { uri: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200&h=200&fit=crop' }, 
-    title: 'More' 
+  {
+    id: "8",
+    image: {
+      uri: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200&h=200&fit=crop",
+    },
+    title: "More",
   },
 ];
 
 const popularProducts = [
   {
-    id: '1',
-    image: { uri: 'https://images.unsplash.com/photo-1530389912609-9a007b3c38a4?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fHByb2R1Y3QlMjBzaG90fGVufDB8fDB8fHww' },
-    title: 'Peter England casual',
-    price: '$45.00',
-    originalPrice: '$50.15',
+    id: "1",
+    image: {
+      uri: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cHJvZHVjdHxlbnwwfHwwfHx8MA%3D%3D",
+    },
+    title: "Peter England casual",
+    price: "৳45.00",
+    originalPrice: "৳50.15",
   },
   {
-    id: '2',
-    image: { uri: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400&h=400&fit=crop' },
-    title: 'Zip-Front Track Jacket',
-    price: '$23.12',
-    originalPrice: '$30.15',
+    id: "2",
+    image: {
+      uri: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400&h=400&fit=crop",
+    },
+    title: "Zip-Front Track Jacket",
+    price: "৳23.12",
+    originalPrice: "৳30.15",
   },
   {
-    id: '3',
-    image: { uri: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop' },
-    title: 'Louis V',
-    price: '$155.00',
-    originalPrice: '$200.00',
+    id: "3",
+    image: {
+      uri: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop",
+    },
+    title: "Louis V",
+    price: "৳155.00",
+    originalPrice: "৳200.00",
   },
   {
-    id: '4',
-    image: { uri: 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=400&h=400&fit=crop' },
-    title: 'Nike Air Max',
-    price: '$89.99',
-    originalPrice: '$120.00',
+    id: "4",
+    image: {
+      uri: "https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=400&h=400&fit=crop",
+    },
+    title: "Nike Air Max",
+    price: "৳89.99",
+    originalPrice: "৳120.00",
   },
   {
-    id: '5',
-    image: { uri: 'https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?w=400&h=400&fit=crop' },
-    title: 'Adidas Ultraboost',
-    price: '$129.99',
-    originalPrice: '$180.00',
+    id: "5",
+    image: {
+      uri: "https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?w=400&h=400&fit=crop",
+    },
+    title: "Adidas Ultraboost",
+    price: "৳129.99",
+    originalPrice: "৳180.00",
   },
 ];
 
 const featuredCategories = [
   {
-    id: '1',
-    image: { uri: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=300&fit=crop' },
-    title: 'Headphones',
-    subtitle: 'Up to 80% off',
+    id: "1",
+    image: {
+      uri: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=300&fit=crop",
+    },
+    title: "Headphones",
+    subtitle: "Up to 80% off",
   },
   {
-    id: '2',
-    image: { uri: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=300&fit=crop' },
-    title: 'Mobile Phones',
-    subtitle: 'From $1999',
+    id: "2",
+    image: {
+      uri: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=300&fit=crop",
+    },
+    title: "Mobile Phones",
+    subtitle: "From ৳1999",
   },
   {
-    id: '3',
-    image: { uri: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400&h=300&fit=crop' },
-    title: 'Laptops',
-    subtitle: 'Up to 50% off',
+    id: "3",
+    image: {
+      uri: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400&h=300&fit=crop",
+    },
+    title: "Laptops",
+    subtitle: "Up to 50% off",
   },
   {
-    id: '4',
-    image: { uri: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=300&fit=crop' },
-    title: 'Cameras',
-    subtitle: 'Up to 60% off',
+    id: "4",
+    image: {
+      uri: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=300&fit=crop",
+    },
+    title: "Cameras",
+    subtitle: "Up to 60% off",
   },
   {
-    id: '5',
-    image: { uri: 'https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=400&h=300&fit=crop' },
-    title: 'Smartwatches',
-    subtitle: 'From $299',
+    id: "5",
+    image: {
+      uri: "https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=400&h=300&fit=crop",
+    },
+    title: "Smartwatches",
+    subtitle: "From ৳299",
   },
 ];
 
 const popularItems = [
   {
-    id: '1',
-    image: { uri: 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=200&h=200&fit=crop' },
-    title: 'Havells Swing Fan',
-    description: '400mm, Blue tone',
-    discount: '20% off',
-    originalPrice: '$1500',
-    currentPrice: '$1,299',
+    id: "1",
+    image: {
+      uri: "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=200&h=200&fit=crop",
+    },
+    title: "Havells Swing Fan",
+    description: "400mm, Blue tone",
+    discount: "20% off",
+    originalPrice: "৳1500",
+    currentPrice: "৳1,299",
   },
   {
-    id: '2',
-    image: { uri: 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=200&h=200&fit=crop' },
-    title: 'OnePlus Nord 2T 5G',
-    description: '8GB RAM, 128GB Storage',
-    discount: '50% off',
-    originalPrice: '$1,500',
-    currentPrice: '$999',
+    id: "2",
+    image: {
+      uri: "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=200&h=200&fit=crop",
+    },
+    title: "OnePlus Nord 2T 5G",
+    description: "8GB RAM, 128GB Storage",
+    discount: "50% off",
+    originalPrice: "৳1,500",
+    currentPrice: "৳999",
   },
   {
-    id: '3',
-    image: { uri: 'https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=200&h=200&fit=crop' },
-    title: 'ThinkPad L13 Yoga Gen 3',
-    description: 'Dual core, Red tone',
-    discount: '20% off',
-    originalPrice: '$2500',
-    currentPrice: '$2299',
+    id: "3",
+    image: {
+      uri: "https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=200&h=200&fit=crop",
+    },
+    title: "ThinkPad L13 Yoga Gen 3",
+    description: "Dual core, Red tone",
+    discount: "20% off",
+    originalPrice: "৳2500",
+    currentPrice: "৳2299",
   },
   {
-    id: '4',
-    image: { uri: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200&h=200&fit=crop' },
-    title: 'Sony WH-1000XM4',
-    description: 'Noise cancelling, Wireless',
-    discount: '30% off',
-    originalPrice: '$349',
-    currentPrice: '$244',
+    id: "4",
+    image: {
+      uri: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200&h=200&fit=crop",
+    },
+    title: "Sony WH-1000XM4",
+    description: "Noise cancelling, Wireless",
+    discount: "30% off",
+    originalPrice: "৳349",
+    currentPrice: "৳244",
   },
   {
-    id: '5',
-    image: { uri: 'https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=200&h=200&fit=crop' },
-    title: 'Apple Watch Series 7',
-    description: 'GPS, Always-On Display',
-    discount: '15% off',
-    originalPrice: '$399',
-    currentPrice: '$339',
+    id: "5",
+    image: {
+      uri: "https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=200&h=200&fit=crop",
+    },
+    title: "Apple Watch Series 7",
+    description: "GPS, Always-On Display",
+    discount: "15% off",
+    originalPrice: "৳399",
+    currentPrice: "৳339",
   },
 ];
 
 const topSelection = [
   {
-    id: '1',
-    image: { uri: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=300&fit=crop' },
-    title: 'Wired Earphones',
-    subtitle: 'upto 50% off',
-    imageBackgroundColor: '#E5E5E5',
+    id: "1",
+    image: {
+      uri: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=300&fit=crop",
+    },
+    title: "Wired Earphones",
+    subtitle: "upto 50% off",
+    imageBackgroundColor: "#E5E5E5",
   },
   {
-    id: '2',
-    image: { uri: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=300&fit=crop' },
-    title: 'Top Mobiles',
-    subtitle: 'upto 50% off',
-    imageBackgroundColor: '#FFE5F0',
+    id: "2",
+    image: {
+      uri: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=300&fit=crop",
+    },
+    title: "Top Mobiles",
+    subtitle: "upto 50% off",
+    imageBackgroundColor: "#FFE5F0",
   },
   {
-    id: '3',
-    image: { uri: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=300&fit=crop' },
-    title: 'Headphones',
-    subtitle: 'upto 50% off',
-    imageBackgroundColor: '#E5E5E5',
+    id: "3",
+    image: {
+      uri: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=300&fit=crop",
+    },
+    title: "Headphones",
+    subtitle: "upto 50% off",
+    imageBackgroundColor: "#E5E5E5",
   },
   {
-    id: '4',
-    image: { uri: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400&h=300&fit=crop' },
-    title: 'Best Laptops',
-    subtitle: 'upto 50% off',
-    imageBackgroundColor: '#2A2A2A',
+    id: "4",
+    image: {
+      uri: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400&h=300&fit=crop",
+    },
+    title: "Best Laptops",
+    subtitle: "upto 50% off",
+    imageBackgroundColor: "#2A2A2A",
   },
 ];
 
 export default function HomeScreen() {
+  const [isLoading, setIsLoading] = useState(true);
   const [cartCount, setCartCount] = useState(3);
   const [currentPopularIndex, setCurrentPopularIndex] = useState(0);
   const [currentFeaturedIndex, setCurrentFeaturedIndex] = useState(0);
+
+  useEffect(() => {
+    // Simulate initial data loading
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, []);
   const popularCarouselRef = useRef<FlatList>(null);
   const featuredCarouselRef = useRef<FlatList>(null);
   const popularScrollX = useRef(new Animated.Value(0)).current;
   const featuredScrollX = useRef(new Animated.Value(0)).current;
-  const popularAutoPlayTimer = useRef<ReturnType<typeof setInterval> | null>(null);
-  const featuredAutoPlayTimer = useRef<ReturnType<typeof setInterval> | null>(null);
-  
+  const popularAutoPlayTimer = useRef<ReturnType<typeof setInterval> | null>(
+    null
+  );
+  const featuredAutoPlayTimer = useRef<ReturnType<typeof setInterval> | null>(
+    null
+  );
+
   const {
     isDrawerVisible,
     openDrawer,
@@ -256,29 +325,32 @@ export default function HomeScreen() {
   } = useSearch();
 
   const handleAddToCart = () => {
-    setCartCount(prev => prev + 1);
+    setCartCount((prev) => prev + 1);
   };
 
   const handleHeroPress = (index: number) => {
-    console.log('Hero image pressed:', index);
+    console.log("Hero image pressed:", index);
     // Navigate to specific category or product based on index
   };
-
   const handleHomeCategoryPress = (category: any) => {
-    console.log('Home category pressed:', category.title);
+    router.push({
+      pathname: "/categories",
+      params: { category: category.id },
+    });
+    console.log("Home category pressed:", category.title);
   };
 
   const handleHomeProductPress = (product: any) => {
-    console.log('Product pressed:', product.title);
+    console.log("Product pressed:", product.title);
     // Navigate to product details with product data
     router.push({
-      pathname: '/product-details',
-      params: { productId: product.id }
+      pathname: "/product-details",
+      params: { productId: product.id },
     });
   };
 
   const handleViewAll = (section: string) => {
-    console.log('View all pressed for:', section);
+    console.log("View all pressed for:", section);
   };
 
   const handleMenuPress = () => {
@@ -295,11 +367,13 @@ export default function HomeScreen() {
     // Create a longer array by repeating the data multiple times
     const repeatedData = [];
     for (let i = 0; i < 3; i++) {
-      repeatedData.push(...data.map((item, index) => ({
-        ...item,
-        id: `${item.id}_${i}`,
-        originalId: item.id,
-      })));
+      repeatedData.push(
+        ...data.map((item, index) => ({
+          ...item,
+          id: `${item.id}_${i}`,
+          originalId: item.id,
+        }))
+      );
     }
     return repeatedData;
   }, []);
@@ -340,7 +414,8 @@ export default function HomeScreen() {
 
     featuredAutoPlayTimer.current = setInterval(() => {
       if (featuredCarouselRef.current) {
-        const nextIndex = (currentFeaturedIndex + 1) % featuredCategories.length;
+        const nextIndex =
+          (currentFeaturedIndex + 1) % featuredCategories.length;
         const targetIndex = nextIndex + featuredCategories.length; // Offset by one set
         featuredCarouselRef.current.scrollToIndex({
           index: targetIndex,
@@ -392,8 +467,6 @@ export default function HomeScreen() {
     itemVisiblePercentThreshold: 50,
   }).current;
 
- 
-
   const renderProductCard = ({ item }: { item: any }) => (
     <ProductCard
       image={item.image}
@@ -424,22 +497,32 @@ export default function HomeScreen() {
   );
   const heroImages = [
     {
-      id: '1',
-      uri: 'https://images.unsplash.com/photo-1607082349566-187342175e2f?w=800&h=400&fit=crop',
+      id: "1",
+      uri: "https://images.unsplash.com/photo-1607082349566-187342175e2f?w=800&h=400&fit=crop",
     },
     {
-      id: '2',
-      uri: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&h=400&fit=crop',
+      id: "2",
+      uri: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&h=400&fit=crop",
     },
     {
-      id: '3',
-      uri: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&h=400&fit=crop',
+      id: "3",
+      uri: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&h=400&fit=crop",
     },
-
-
   ];
+  if (isLoading) {
+    return (
+      <SafeAreaView
+        style={styles.container}
+        edges={["left", "right", "bottom"]}
+      >
+        <StatusBar barStyle="light-content" backgroundColor="#181A20" />
+        <Loader fullscreen message="Loading Home..." />
+      </SafeAreaView>
+    );
+  }
+
   return (
-    <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
+    <SafeAreaView style={styles.container} edges={["left", "right", "bottom"]}>
       <StatusBar barStyle="light-content" backgroundColor="#181A20" />
       {/* Header */}
       <AppHeader
@@ -448,8 +531,8 @@ export default function HomeScreen() {
         showLogo={true}
         onMenuPress={handleMenuPress}
         onSearchPress={handleSearchPress}
-        onWishlistPress={() => console.log('Wishlist pressed')}
-        onCartPress={() => console.log('Cart pressed')}
+        onWishlistPress={() => console.log("Wishlist pressed")}
+        onCartPress={() => console.log("Cart pressed")}
       />
 
       <ScrollView
@@ -467,7 +550,6 @@ export default function HomeScreen() {
           showPagination={true}
           onImagePress={handleHeroPress}
         />
-   
 
         {/* Categories Grid */}
         <View style={styles.categoriesContainer}>
@@ -494,8 +576,8 @@ export default function HomeScreen() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Most Popular</Text>
-            <Pressable onPress={() => handleViewAll('Most Popular')}>
-              <Text style={styles.viewAllText}>View all {'>'}</Text>
+            <Pressable onPress={() => handleViewAll("Most Popular")}>
+              <Text style={styles.viewAllText}>View all {">"}</Text>
             </Pressable>
           </View>
           <View style={styles.carouselContainer}>
@@ -527,13 +609,12 @@ export default function HomeScreen() {
                 const actualIndex = index % popularProducts.length;
                 setCurrentPopularIndex(actualIndex);
               }}
-                         />
-           </View>
+            />
+          </View>
         </View>
 
         {/* Featured Categories */}
         <View style={[styles.section, styles.featuredCategoriesSection]}>
-          
           <View style={styles.carouselContainer}>
             <FlatList
               ref={featuredCarouselRef}
@@ -571,8 +652,8 @@ export default function HomeScreen() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Popular Items</Text>
-            <Pressable onPress={() => handleViewAll('Popular Items')}>
-              <Text style={styles.viewAllText}>View all {'>'}</Text>
+            <Pressable onPress={() => handleViewAll("Popular Items")}>
+              <Text style={styles.viewAllText}>View all {">"}</Text>
             </Pressable>
           </View>
           <View style={styles.popularItemsContainer}>
@@ -594,7 +675,6 @@ export default function HomeScreen() {
 
         {/* Top Selection */}
         <View style={[styles.section, styles.topSelectionSection]}>
-
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Top Selection</Text>
           </View>
@@ -607,7 +687,6 @@ export default function HomeScreen() {
             ))}
           </View>
         </View>
-
       </ScrollView>
 
       {/* Drawer */}
@@ -643,7 +722,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#181A20',
+    backgroundColor: "#181A20",
   },
   scrollView: {
     flex: 1,
@@ -652,7 +731,7 @@ const styles = StyleSheet.create({
     paddingBottom: 100, // Space for bottom tab bar
   },
   categoriesContainer: {
-    backgroundColor: '#23262F',
+    backgroundColor: "#23262F",
     paddingVertical: 16,
   },
   categoriesGrid: {
@@ -664,20 +743,20 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
   },
   sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingHorizontal: 20,
     marginBottom: 16,
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '700',
-    color: '#F4F4F4',
+    fontWeight: "700",
+    color: "#F4F4F4",
   },
   viewAllText: {
     fontSize: 14,
-    color: '#A0A0A0',
+    color: "#A0A0A0",
   },
   horizontalList: {
     paddingHorizontal: 20,
@@ -686,13 +765,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   carouselContainer: {
-    position: 'relative',
+    position: "relative",
     marginBottom: 20,
   },
   paginationContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
     marginTop: 16,
     paddingHorizontal: 20,
   },
@@ -704,21 +783,21 @@ const styles = StyleSheet.create({
   },
   featuredCategoriesSection: {
     borderTopWidth: 1,
-    borderTopColor: '#2A2D35',
+    borderTopColor: "#2A2D35",
     borderBottomWidth: 1,
-    borderBottomColor: '#2A2D35',
+    borderBottomColor: "#2A2D35",
   },
   topSelectionSection: {
-    backgroundColor: '#2F2F2F',
+    backgroundColor: "#2F2F2F",
   },
   topSelectionGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
     paddingHorizontal: 20,
   },
   topSelectionItem: {
-    width: '48%',
+    width: "48%",
     marginBottom: 20,
   },
 });

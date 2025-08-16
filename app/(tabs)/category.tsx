@@ -18,31 +18,31 @@ import { useDrawer } from '@/hooks/useDrawer';
 const categoryProducts = [
   {
     id: '1',
-    image: { uri: 'https://images.unsplash.com/photo-1530389912609-9a007b3c38a4?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fHByb2R1Y3QlMjBzaG90fGVufDB8fDB8fHww' },
+    image: { uri: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cHJvZHVjdHxlbnwwfHwwfHx8MA%3D%3D' },
     title: 'Casual Shirt',
-    price: '$45.00',
-    originalPrice: '$50.15',
+    price: '৳45.00',
+    originalPrice: '৳50.15',
   },
   {
     id: '2',
     image: { uri: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400&h=400&fit=crop' },
     title: 'Track Jacket',
-    price: '$23.12',
-    originalPrice: '$30.15',
+    price: '৳23.12',
+    originalPrice: '৳30.15',
   },
   {
     id: '3',
     image: { uri: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop' },
     title: 'Running Shoes',
-    price: '$155.00',
-    originalPrice: '$200.00',
+    price: '৳155.00',
+    originalPrice: '৳200.00',
   },
   {
     id: '4',
     image: { uri: 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=400&h=400&fit=crop' },
     title: 'Sports Bag',
-    price: '$89.99',
-    originalPrice: '$120.00',
+    price: '৳89.99',
+    originalPrice: '৳120.00',
   },
 ];
 

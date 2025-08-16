@@ -1,14 +1,15 @@
+import { Loader } from '@/components/ui/Loader';
 import { SafeAreaView } from '@/components/ui/SafeAreaProvider';
 import { Ionicons } from '@expo/vector-icons';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-  Image,
-  Pressable,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  View
+    Image,
+    Pressable,
+    ScrollView,
+    StatusBar,
+    StyleSheet,
+    Text,
+    View
 } from 'react-native';
 
 import { AppHeader } from '@/components/ui/AppHeader';
@@ -49,7 +50,16 @@ const profileOptions = [
 ];
 
 export default function ProfileScreen() {
+  const [isLoading, setIsLoading] = useState(true);
   const [cartCount, setCartCount] = useState(0);
+
+  useEffect(() => {
+    // Simulate loading profile data
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, []);
   const {
     isDrawerVisible,
     openDrawer,
@@ -65,6 +75,15 @@ export default function ProfileScreen() {
   const handleOptionPress = (optionId: string) => {
     console.log('Option pressed:', optionId);
   };
+
+  if (isLoading) {
+    return (
+      <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
+        <StatusBar barStyle="light-content" backgroundColor="#181A20" />
+        <Loader fullscreen message="Loading Profile..." />
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>

@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Animated,
   Image,
@@ -9,6 +9,7 @@ import {
   Text,
   View,
 } from 'react-native';
+import { Loader } from './Loader';
 import { useSafeArea } from './SafeAreaProvider';
 
 interface SubCategory {
@@ -40,6 +41,9 @@ const categories: Category[] = [
       { id: '1-2', name: 'Laptops' },
       { id: '1-3', name: 'Tablets' },
       { id: '1-4', name: 'Accessories' },
+      { id: '1-5', name: 'Accessories' },
+      { id: '1-6', name: 'Accessories' },
+       { id: '1-7', name: 'Tablets' },
     ],
   },
   {
@@ -109,7 +113,7 @@ const categories: Category[] = [
     ],
   },
   {
-    id: '7',
+    id: '8',
     name: 'Sports',
     icon: 'football',
     subCategories: [
@@ -140,7 +144,7 @@ const CategoryItem: React.FC<{
 
   const maxHeight = animation.interpolate({
     inputRange: [0, 1],
-    outputRange: [0, category.subCategories.length * 40],
+    outputRange: [0, category.subCategories.length * 50],
   });
 
   return (
@@ -192,8 +196,27 @@ export const Drawer: React.FC<DrawerProps> = ({
   onSubCategoryPress,
 }) => {
   const insets = useSafeArea();
+  const [isLoading, setIsLoading] = useState(true);
   
+  useEffect(() => {
+    // Simulate loading time
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
   if (!isVisible) return null;
+  
+  if (isLoading) {
+    return (
+      <View style={[styles.overlay]}>
+        <View style={[styles.drawer, { paddingTop: insets.top }]}>
+          <Loader fullscreen message="Loading..." />
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.overlay}>
@@ -207,10 +230,10 @@ export const Drawer: React.FC<DrawerProps> = ({
         
         <View style={styles.logoContainer}>
           <Image
-            source={{ uri: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=200&h=200&fit=crop' }}
+            source={{ uri: 'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=400&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8bG9nb3xlbnwwfHwwfHx8MA%3D%3D' }}
             style={styles.logo}
           />
-          <Text style={styles.logoText}>Star Design</Text>
+          {/* <Text style={styles.logoText}>Star Design</Text> */}
         </View>
 
         <ScrollView style={styles.categoriesContainer} showsVerticalScrollIndicator={false}>
@@ -225,14 +248,19 @@ export const Drawer: React.FC<DrawerProps> = ({
         </ScrollView>
 
         <View style={styles.footer}>
-          <Pressable style={styles.footerButton}>
-            <Ionicons name="settings" size={20} color="#F4F4F4" />
-            <Text style={styles.footerButtonText}>Settings</Text>
-          </Pressable>
-          <Pressable style={styles.footerButton}>
-            <Ionicons name="help-circle" size={20} color="#F4F4F4" />
-            <Text style={styles.footerButtonText}>Help</Text>
-          </Pressable>
+          {/* <View style={styles.footerButtons}>
+            <Pressable style={styles.footerButton}>
+              <Ionicons name="settings" size={20} color="#F4F4F4" />
+              <Text style={styles.footerButtonText}>Settings</Text>
+            </Pressable>
+            <Pressable style={styles.footerButton}>
+              <Ionicons name="help-circle" size={20} color="#F4F4F4" />
+              <Text style={styles.footerButtonText}>Help</Text>
+            </Pressable>
+          </View> */}
+          <Text style={styles.copyright}>
+            © {new Date().getFullYear()} Star Design. All rights reserved.
+          </Text>
         </View>
       </View>
     </View>
@@ -264,29 +292,32 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: '#181A20',
     borderRightWidth: 1,
+    paddingBottom:70,
     borderRightColor: '#23262F',
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
     paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 20,
+    // paddingTop: 20,
+    // paddingBottom: 20,
   },
   closeButton: {
     padding: 8,
   },
   logoContainer: {
     alignItems: 'center',
-    paddingVertical: 0,
+    paddingVertical: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#23262F',
+    backgroundColor: '#23262F',
+    marginBottom: 8,
   },
   logo: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    marginBottom: 10,
+    width: '90%',
+    height: 80,
+    borderRadius: 8,
+    resizeMode: 'cover',
   },
   logoText: {
     fontSize: 18,
@@ -324,7 +355,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   subCategoryItem: {
-    paddingVertical: 10,
+    paddingVertical: 12,
     paddingHorizontal: 32,
     backgroundColor: '#1E1E1E',
     marginTop: 1,
@@ -334,11 +365,14 @@ const styles = StyleSheet.create({
     color: '#A0A0A0',
   },
   footer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingVertical: 20,
+    paddingVertical: 16,
     borderTopWidth: 1,
     borderTopColor: '#23262F',
+  },
+  footerButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 16,
   },
   footerButton: {
     flexDirection: 'row',
@@ -350,5 +384,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#F4F4F4',
     marginLeft: 8,
+  },
+  copyright: {
+    fontSize: 12,
+    color: '#A0A0A0',
+    textAlign: 'center',
+    paddingHorizontal: 20,
   },
 }); 

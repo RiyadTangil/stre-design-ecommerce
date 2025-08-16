@@ -1,8 +1,9 @@
+import { Loader } from '@/components/ui/Loader';
 import { SafeAreaView } from '@/components/ui/SafeAreaProvider';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Animated,
   FlatList,
@@ -20,11 +21,11 @@ import { ImageWithFallback } from '@/components/ui/ImageWithFallback';
 const wishlistItems = [
   {
     id: '1',
-    image: { uri: 'https://images.unsplash.com/photo-1530389912609-9a007b3c38a4?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fHByb2R1Y3QlMjBzaG90fGVufDB8fDB8fHww' },
+    image: { uri: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cHJvZHVjdHxlbnwwfHwwfHx8MA%3D%3D' },
     category: 'Jacket',
     title: 'Men Black Grey Allover Printed Round Neck ...',
-    currentPrice: '$25.15',
-    originalPrice: '$30.15',
+    currentPrice: '৳25.15',
+    originalPrice: '৳30.15',
     isWishlisted: true,
   },
   {
@@ -32,8 +33,8 @@ const wishlistItems = [
     image: { uri: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400&h=400&fit=crop' },
     category: 'T-Shirt',
     title: 'Pink Winter Sweater and Jacket with Cap',
-    currentPrice: '$25.15',
-    originalPrice: '$30.15',
+    currentPrice: '৳25.15',
+    originalPrice: '৳30.15',
     isWishlisted: true,
   },
   {
@@ -41,17 +42,17 @@ const wishlistItems = [
     image: { uri: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop' },
     category: 'T-Shirt',
     title: 'Men Black Grey Allover Printed Round Neck ...',
-    currentPrice: '$25.15',
-    originalPrice: '$30.15',
+    currentPrice: '৳25.15',
+    originalPrice: '৳30.15',
     isWishlisted: true,
   },
   {
     id: '4',
-    image: { uri: 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=400&h=400&fit=crop' },
+    image: { uri: "https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=400&h=400&fit=crop"},
     category: 'Jacket',
     title: 'Pink Winter Sweater and Jacket with Cap',
-    currentPrice: '$25.15',
-    originalPrice: '$30.15',
+    currentPrice: '৳25.15',
+    originalPrice: '৳30.15',
     isWishlisted: false,
   },
 ];
@@ -163,8 +164,17 @@ const WishlistItem = ({ item, onToggleWishlist, onPress, viewMode }: {
 };
 
 export default function WishlistScreen() {
+  const [isLoading, setIsLoading] = useState(true);
   const [wishlistData, setWishlistData] = useState(wishlistItems);
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
+
+  useEffect(() => {
+    // Simulate loading wishlist data
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, []);
   const listButtonScale = useRef(new Animated.Value(1)).current;
   const gridButtonScale = useRef(new Animated.Value(1)).current;
   const backButtonScale = useRef(new Animated.Value(1)).current;
@@ -233,6 +243,15 @@ export default function WishlistScreen() {
       viewMode={viewMode}
     />
   );
+
+  if (isLoading) {
+    return (
+      <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
+        <StatusBar barStyle="light-content" backgroundColor="#1A1C20" />
+        <Loader fullscreen message="Loading Wishlist..." />
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
@@ -363,14 +382,21 @@ const styles = StyleSheet.create({
   imageContainer: {
     width: 100,
     height: 100,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   imageWrapper: {
     position: 'relative',
+    width: 90,
+    height: 90,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   productImage: {
-    width: '100%',
-    height: '100%',
+    width: 90,
+    height: 90,
     borderRadius: 16,
+    backgroundColor: '#23262F',
   },
   heartButton: {
     position: 'absolute',

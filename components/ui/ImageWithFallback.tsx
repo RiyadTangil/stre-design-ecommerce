@@ -15,16 +15,17 @@ export const ImageWithFallback: React.FC<ImageWithFallbackProps> = ({
 }) => {
   const [hasError, setHasError] = useState(false);
 
-  if (hasError || !source) {
+  if (hasError || !source || !source.uri) {
     return (
       <View
         style={[
           styles.fallback,
           { backgroundColor: fallbackColor },
           style,
+          { width: 90, height: 90, borderRadius: 16 },
         ]}
       >
-        <Ionicons name="image-outline" size={24} color="#ccc" />
+        <Ionicons name="image-outline" size={32} color="#ccc" />
       </View>
     );
   }

@@ -14,6 +14,7 @@ import {
 import { CategoryCard } from '@/components/ui/CategoryCard';
 import { Drawer } from '@/components/ui/Drawer';
 import { useDrawer } from '@/hooks/useDrawer';
+import { router } from 'expo-router';
 
 // Mock data for categories matching the image
 const categories = [
@@ -29,7 +30,7 @@ const categories = [
   },
   { 
     id: '3', 
-    image: { uri: 'https://images.unsplash.com/photo-1530389912609-9a007b3c38a4?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fHByb2R1Y3QlMjBzaG90fGVufDB8fDB8fHww' }, 
+    image: { uri: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cHJvZHVjdHxlbnwwfHwwfHx8MA%3D%3D' }, 
     title: 'Fashion' 
   },
   { 
@@ -54,7 +55,7 @@ const categories = [
   },
   { 
     id: '8', 
-    image: { uri: 'https://images.unsplash.com/photo-1530389912609-9a007b3c38a4?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fHByb2R1Y3QlMjBzaG90fGVufDB8fDB8fHww' }, 
+    image: { uri: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cHJvZHVjdHxlbnwwfHwwfHx8MA%3D%3D' }, 
     title: 'Fashion' 
   },
 ];
@@ -100,6 +101,10 @@ export default function CategoriesScreen() {
 
   const handleCategoriesScreenCategoryPress = (category: any) => {
     console.log('Category pressed:', category.title);
+     router.push({
+          pathname: "/products",
+          params: { category: category.id },
+        });
   };
 
   const handleShopNowPress = (banner: any) => {
