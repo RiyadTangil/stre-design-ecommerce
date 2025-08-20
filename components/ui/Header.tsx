@@ -2,31 +2,71 @@ import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 
+type RightIconType = 'search' | 'wishlist' | 'cart';
+type LeftIconType = 'menu' | 'back';
+
 interface HeaderProps {
   title: string;
-  onMenuPress?: () => void;
+  leftIcon?: LeftIconType;
+  onLeftIconPress?: () => void;
   onSearchPress?: () => void;
   onWishlistPress?: () => void;
   onCartPress?: () => void;
   cartCount?: number;
   showLogo?: boolean;
+  rightIcons?: RightIconType[];
 }
 
 export const Header: React.FC<HeaderProps> = ({
   title,
-  onMenuPress,
+  leftIcon = 'menu',
+  onLeftIconPress,
   onSearchPress,
   onWishlistPress,
   onCartPress,
   cartCount = 0,
   showLogo = false,
+  rightIcons = ['search', 'wishlist', 'cart'],
 }) => {
+  const renderRightIcon = (iconType: RightIconType) => {
+    switch (iconType) {
+      case 'search':
+        return (
+          <Pressable key="search" style={styles.iconButton} onPress={onSearchPress}>
+            <Ionicons name="search" size={24} color="#F4F4F4" />
+          </Pressable>
+        );
+      case 'wishlist':
+        return (
+          <Pressable key="wishlist" style={styles.iconButton} onPress={onWishlistPress}>
+            <Ionicons name="heart-outline" size={24} color="#F4F4F4" />
+          </Pressable>
+        );
+      case 'cart':
+        return (
+          <Pressable key="cart" style={styles.cartButton} onPress={onCartPress}>
+            <Ionicons name="cart-outline" size={24} color="#F4F4F4" />
+            {cartCount > 0 && (
+              <View style={styles.cartBadge}>
+                <Text style={styles.cartBadgeText}>{cartCount}</Text>
+              </View>
+            )}
+          </Pressable>
+        );
+      default:
+        return null;
+    }
+  };
   return (
     <View style={styles.container}>
       <View style={styles.headerContent}>
         <View style={styles.leftSection}>
-          <Pressable style={styles.menuButton} onPress={onMenuPress}>
-            <Ionicons name="menu" size={24} color="#F4F4F4" />
+          <Pressable style={styles.menuButton} onPress={onLeftIconPress}>
+            <Ionicons 
+              name={leftIcon === 'back' ? 'arrow-back' : 'menu'} 
+              size={24} 
+              color="#F4F4F4" 
+            />
           </Pressable>
           {showLogo ? (
             <View style={styles.logoContainer}>
@@ -41,20 +81,7 @@ export const Header: React.FC<HeaderProps> = ({
           )}
         </View>
         <View style={styles.rightSection}>
-          <Pressable style={styles.iconButton} onPress={onSearchPress}>
-            <Ionicons name="search" size={24} color="#F4F4F4" />
-          </Pressable>
-          <Pressable style={styles.iconButton} onPress={onWishlistPress}>
-            <Ionicons name="heart-outline" size={24} color="#F4F4F4" />
-          </Pressable>
-          <Pressable style={styles.cartButton} onPress={onCartPress}>
-            <Ionicons name="cart-outline" size={24} color="#F4F4F4" />
-            {cartCount > 0 && (
-              <View style={styles.cartBadge}>
-                <Text style={styles.cartBadgeText}>{cartCount}</Text>
-              </View>
-            )}
-          </Pressable>
+          {rightIcons.map(renderRightIcon)}
         </View>
       </View>
     </View>
@@ -128,4 +155,4 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: 'white',
   },
-}); 
+});

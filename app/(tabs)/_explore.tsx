@@ -1,7 +1,7 @@
 import { ThemedText } from '@/components/ThemedText';
 import { useState } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { PageWrapper } from '@/components/ui/PageWrapper';
 import { WebView } from 'react-native-webview';
 
 export default function TabTwoScreen() {
@@ -75,24 +75,28 @@ export default function TabTwoScreen() {
 
   if (hasError) {
     return (
-      <SafeAreaView style={styles.container}>
+      <PageWrapper
+        title="Explore"
+        showLogo={true}
+        style={styles.container}
+      >
         <View style={styles.errorContainer}>
           <ThemedText style={styles.errorText}>
             Unable to load content. Please check your internet connection and try again.
           </ThemedText>
         </View>
-      </SafeAreaView>
+      </PageWrapper>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      {isLoading && (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#007AFF" />
-          <ThemedText style={styles.loadingText}>Loading...</ThemedText>
-        </View>
-      )}
+    <PageWrapper
+      title="Explore"
+      showLogo={true}
+      isLoading={isLoading}
+      loadingMessage="Loading..."
+      style={styles.container}
+    >
       <WebView
         source={{ uri: 'https://stardesignbd.com/' }}
         style={[styles.webview, isLoading && styles.hidden]}
@@ -109,7 +113,7 @@ export default function TabTwoScreen() {
         onLoadEnd={handleLoadEnd}
         onError={handleError}
       />
-    </SafeAreaView>
+    </PageWrapper>
   );
 }
 

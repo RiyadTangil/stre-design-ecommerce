@@ -22,7 +22,6 @@ export const ImageWithFallback: React.FC<ImageWithFallbackProps> = ({
           styles.fallback,
           { backgroundColor: fallbackColor },
           style,
-          { width: 90, height: 90, borderRadius: 16 },
         ]}
       >
         <Ionicons name="image-outline" size={32} color="#ccc" />
@@ -45,4 +44,4 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-}); 
+});

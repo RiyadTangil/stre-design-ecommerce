@@ -1,18 +1,17 @@
-import { SafeAreaView } from '@/components/ui/SafeAreaProvider';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import {
   Image,
   Pressable,
   ScrollView,
-  StatusBar,
   StyleSheet,
   Text,
   View
 } from 'react-native';
 
 import { CategoryCard } from '@/components/ui/CategoryCard';
-import { Drawer } from '@/components/ui/Drawer';
+
+import { PageWrapper } from '@/components/ui/PageWrapper';
 import { useDrawer } from '@/hooks/useDrawer';
 import { router } from 'expo-router';
 
@@ -116,20 +115,17 @@ export default function CategoriesScreen() {
 
 
   return (
-    <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
-      <StatusBar barStyle="light-content" backgroundColor="#181A20" />
-      
-      {/* Custom Header for All Categories */}
-      <View style={styles.customHeader}>
-        <Pressable style={styles.backButton} onPress={() => console.log('Back pressed')}>
-          <Ionicons name="chevron-back" size={24} color="#FFFFFF" />
-        </Pressable>
-        <Text style={styles.headerTitle}>All Categories</Text>
-        <Pressable style={styles.searchButton} onPress={() => console.log('Search pressed')}>
-          <Ionicons name="search" size={24} color="#FFFFFF" />
-        </Pressable>
-      </View>
-
+    <PageWrapper
+      title="All Categories"
+      showLogo={false}
+      leftIcon="back"
+      onLeftIconPress={() => console.log('Back pressed')}
+      showDrawer={true}
+      onCategoryPress={handleCategoryPress}
+      onSubCategoryPress={handleSubCategoryPress}
+      onSearchPress={() => console.log('Search pressed')}
+      onWishlistPress={() => console.log('Wishlist pressed')}
+    >
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
@@ -177,13 +173,7 @@ export default function CategoriesScreen() {
         <View style={styles.bottomSpacing} />
       </ScrollView>
 
-      <Drawer
-        isVisible={isDrawerVisible}
-        onClose={closeDrawer}
-        onCategoryPress={handleCategoryPress}
-        onSubCategoryPress={handleSubCategoryPress}
-      />
-    </SafeAreaView>
+    </PageWrapper>
   );
 }
 
@@ -306,4 +296,4 @@ const styles = StyleSheet.create({
   bottomSpacing: {
     height: 20,
   },
-}); 
+});

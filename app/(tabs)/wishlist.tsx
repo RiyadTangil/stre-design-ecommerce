@@ -1,5 +1,3 @@
-import { Loader } from '@/components/ui/Loader';
-import { SafeAreaView } from '@/components/ui/SafeAreaProvider';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
@@ -8,7 +6,6 @@ import {
   Animated,
   FlatList,
   Pressable,
-  StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -16,6 +13,8 @@ import {
 } from 'react-native';
 
 import { ImageWithFallback } from '@/components/ui/ImageWithFallback';
+import { ProductGridCard } from '@/components/ui/ProductGridCard';
+import { PageWrapper } from '@/components/ui/PageWrapper';
 
 // Mock data for wishlist items based on the image
 const wishlistItems = [
@@ -87,38 +86,12 @@ const WishlistItem = ({ item, onToggleWishlist, onPress, viewMode }: {
   };
   if (viewMode === 'grid') {
     return (
-      <Pressable style={styles.wishlistItemGrid} onPress={() => onPress(item)}>
-        <View style={styles.imageWrapperGrid}>
-          <ImageWithFallback
-            source={item.image}
-            style={styles.productImageGrid}
-            resizeMode="cover"
-            fallbackColor="#3A3F47"
-          />
-          <Animated.View style={[styles.heartButtonGrid, { transform: [{ scale: scaleAnim }] }]}>
-            <TouchableOpacity
-              onPress={handleHeartPress}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            >
-              <MaterialIcons
-                name={item.isWishlisted ? 'favorite' : 'favorite-border'}
-                size={16}
-                color="#FF6B9D"
-              />
-            </TouchableOpacity>
-          </Animated.View>
-        </View>
-        <View style={styles.detailsContainerGrid}>
-          <Text style={styles.categoryTextGrid}>{item.category}</Text>
-          <Text style={styles.titleTextGrid} numberOfLines={2}>
-            {item.title}
-          </Text>
-          <View style={styles.priceContainerGrid}>
-            <Text style={styles.currentPriceGrid}>{item.currentPrice}</Text>
-            <Text style={styles.originalPriceGrid}>{item.originalPrice}</Text>
-          </View>
-        </View>
-      </Pressable>
+      <ProductGridCard
+        item={item}
+        onPress={onPress}
+        onToggleWishlist={onToggleWishlist}
+        showWishlistButton={true}
+      />
     );
   }
 
@@ -244,20 +217,18 @@ export default function WishlistScreen() {
     />
   );
 
-  if (isLoading) {
-    return (
-      <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
-        <StatusBar barStyle="light-content" backgroundColor="#1A1C20" />
-        <Loader fullscreen message="Loading Wishlist..." />
-      </SafeAreaView>
-    );
-  }
-
   return (
-    <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
-      <StatusBar barStyle="light-content" backgroundColor="#1A1C20" />
-      
-      {/* Custom Header */}
+    <PageWrapper
+      title="Wishlist"
+      showLogo={false}
+      isLoading={isLoading}
+      loadingMessage="Loading Wishlist..."
+      leftIcon="back"
+      onLeftIconPress={handleBackPress}
+      onSearchPress={() => console.log('Search pressed')}
+      onWishlistPress={() => console.log('Wishlist pressed')}
+    >
+      {/* Custom Header Actions */}
       <View style={styles.header}>
         <Animated.View style={{ transform: [{ scale: backButtonScale }] }}>
           <TouchableOpacity style={styles.backButton} onPress={handleBackPress}>
@@ -312,7 +283,7 @@ export default function WishlistScreen() {
         columnWrapperStyle={viewMode === 'grid' ? styles.gridRow : undefined}
       />
 
-    </SafeAreaView>
+    </PageWrapper>
   );
 }
 
@@ -444,73 +415,5 @@ const styles = StyleSheet.create({
     color: '#9B9B9B',
     textDecorationLine: 'line-through',
   },
-  // Grid View Styles
-  wishlistItemGrid: {
-    backgroundColor: '#23262F',
-    marginBottom: 16,
-    borderRadius: 12,
-    padding: 12,
-    flex: 1,
-    marginHorizontal: 5,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  imageWrapperGrid: {
-    position: 'relative',
-    marginBottom: 12,
-  },
-  productImageGrid: {
-    width: '100%',
-    height: 120,
-    borderRadius: 8,
-  },
-  heartButtonGrid: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
-    width: 24,
-    height: 24,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#FF6B9D',
-  },
-  detailsContainerGrid: {
-    flex: 1,
-  },
-  categoryTextGrid: {
-    fontSize: 11,
-    color: '#9B9B9B',
-    marginBottom: 4,
-  },
-  titleTextGrid: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#FFFFFF',
-    lineHeight: 16,
-    marginBottom: 8,
-  },
-  priceContainerGrid: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  currentPriceGrid: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#FFFFFF',
-  },
-  originalPriceGrid: {
-    fontSize: 12,
-    color: '#9B9B9B',
-    textDecorationLine: 'line-through',
-  },
-}); 
+  // Grid styles are now handled by ProductGridCard component
+});

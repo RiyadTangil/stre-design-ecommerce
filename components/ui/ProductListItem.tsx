@@ -60,8 +60,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#23262F",
   },
   image: {
-    width: 60,
-    height: 60,
+    width: 80,
+    height: 90,
     borderRadius: 8,
     marginRight: 16,
   },

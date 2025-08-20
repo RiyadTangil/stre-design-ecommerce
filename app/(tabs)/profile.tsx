@@ -1,19 +1,16 @@
-import { Loader } from '@/components/ui/Loader';
-import { SafeAreaView } from '@/components/ui/SafeAreaProvider';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react';
 import {
     Image,
     Pressable,
     ScrollView,
-    StatusBar,
     StyleSheet,
     Text,
     View
 } from 'react-native';
 
-import { AppHeader } from '@/components/ui/AppHeader';
-import { Drawer } from '@/components/ui/Drawer';
+
+import { PageWrapper } from '@/components/ui/PageWrapper';
 import { useDrawer } from '@/hooks/useDrawer';
 
 const profileOptions = [
@@ -51,7 +48,6 @@ const profileOptions = [
 
 export default function ProfileScreen() {
   const [isLoading, setIsLoading] = useState(true);
-  const [cartCount, setCartCount] = useState(0);
 
   useEffect(() => {
     // Simulate loading profile data
@@ -76,29 +72,18 @@ export default function ProfileScreen() {
     console.log('Option pressed:', optionId);
   };
 
-  if (isLoading) {
-    return (
-      <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
-        <StatusBar barStyle="light-content" backgroundColor="#181A20" />
-        <Loader fullscreen message="Loading Profile..." />
-      </SafeAreaView>
-    );
-  }
-
   return (
-    <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
-      <StatusBar barStyle="light-content" backgroundColor="#181A20" />
-      
-      <AppHeader
-        title="Profile"
-        cartCount={cartCount}
-        showLogo={false}
-        onMenuPress={handleMenuPress}
-        onSearchPress={() => console.log('Search pressed')}
-        onWishlistPress={() => console.log('Wishlist pressed')}
-        onCartPress={() => console.log('Cart pressed')}
-      />
-
+    <PageWrapper
+      title="Profile"
+      showLogo={false}
+      isLoading={isLoading}
+      loadingMessage="Loading Profile..."
+      showDrawer={true}
+      onCategoryPress={handleCategoryPress}
+      onSubCategoryPress={handleSubCategoryPress}
+      onSearchPress={() => console.log('Search pressed')}
+      onWishlistPress={() => console.log('Wishlist pressed')}
+    >
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
@@ -146,13 +131,7 @@ export default function ProfileScreen() {
         </View>
       </ScrollView>
 
-      <Drawer
-        isVisible={isDrawerVisible}
-        onClose={closeDrawer}
-        onCategoryPress={handleCategoryPress}
-        onSubCategoryPress={handleSubCategoryPress}
-      />
-    </SafeAreaView>
+    </PageWrapper>
   );
 }
 
@@ -253,4 +232,4 @@ const styles = StyleSheet.create({
     color: '#FF6B9D',
     marginLeft: 8,
   },
-}); 
+});

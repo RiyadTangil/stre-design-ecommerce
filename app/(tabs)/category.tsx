@@ -1,17 +1,16 @@
-import { SafeAreaView } from '@/components/ui/SafeAreaProvider';
 import React, { useState } from 'react';
 import {
   FlatList,
   ScrollView,
-  StatusBar,
   StyleSheet,
   Text,
   View
 } from 'react-native';
 
-import { AppHeader } from '@/components/ui/AppHeader';
-import { Drawer } from '@/components/ui/Drawer';
+
+import { PageWrapper } from '@/components/ui/PageWrapper';
 import { ProductCard } from '@/components/ui/ProductCard';
+import { useCart } from '@/contexts/CartContext';
 import { useDrawer } from '@/hooks/useDrawer';
 
 // Mock data for category products
@@ -47,7 +46,7 @@ const categoryProducts = [
 ];
 
 export default function CategoryScreen() {
-  const [cartCount, setCartCount] = useState(2);
+  const { addToCart } = useCart();
   const {
     isDrawerVisible,
     openDrawer,
@@ -56,8 +55,14 @@ export default function CategoryScreen() {
     handleSubCategoryPress,
   } = useDrawer();
 
-  const handleAddToCart = () => {
-    setCartCount(prev => prev + 1);
+  const handleAddToCart = (product: any) => {
+    addToCart({
+      id: product.id,
+      title: product.title,
+      price: parseFloat(product.price.replace('৳', '')),
+      image: product.image,
+      quantity: 1
+    });
   };
 
   const handleProductPress = (product: any) => {
@@ -75,24 +80,21 @@ export default function CategoryScreen() {
       price={item.price}
       originalPrice={item.originalPrice}
       onPress={() => handleProductPress(item)}
-      onAddToCart={handleAddToCart}
+      onAddToCart={() => handleAddToCart(item)}
     />
   );
 
   return (
-    <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
-      <StatusBar barStyle="light-content" backgroundColor="#181A20" />
-      
-      {/* Header - Shows text instead of logo on non-home pages */}
-      <AppHeader
-        title="Fashion"
-        cartCount={cartCount}
-        showLogo={false}
-        onMenuPress={handleMenuPress}
-        onSearchPress={() => console.log('Search pressed')}
-        onWishlistPress={() => console.log('Wishlist pressed')}
-        onCartPress={() => console.log('Cart pressed')}
-      />
+    <PageWrapper
+      title="Fashion"
+      showLogo={false}
+      showDrawer={true}
+      onCategoryPress={handleCategoryPress}
+      onSubCategoryPress={handleSubCategoryPress}
+      onSearchPress={() => console.log('Search pressed')}
+      onWishlistPress={() => console.log('Wishlist pressed')}
+      style={styles.container}
+    >
 
       <ScrollView
         style={styles.scrollView}
@@ -121,14 +123,7 @@ export default function CategoryScreen() {
         <View style={styles.bottomSpacing} />
       </ScrollView>
 
-      {/* Drawer - Reused from home screen */}
-      <Drawer
-        isVisible={isDrawerVisible}
-        onClose={closeDrawer}
-        onCategoryPress={handleCategoryPress}
-        onSubCategoryPress={handleSubCategoryPress}
-      />
-    </SafeAreaView>
+    </PageWrapper>
   );
 }
 
@@ -168,4 +163,4 @@ const styles = StyleSheet.create({
   bottomSpacing: {
     height: 20,
   },
-}); 
+});

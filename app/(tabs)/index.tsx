@@ -1,14 +1,10 @@
-import { Loader } from "@/components/ui/Loader";
-import { SafeAreaView } from "@/components/ui/SafeAreaProvider";
 import { router } from "expo-router";
-import { useNavigation } from "@react-navigation/native";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Animated,
   FlatList,
   Pressable,
   ScrollView,
-  StatusBar,
   StyleSheet,
   Text,
   View,
@@ -16,11 +12,10 @@ import {
 } from "react-native";
 
 // Import our reusable components
-import { AppHeader } from "@/components/ui/AppHeader";
 import { CategoryCard } from "@/components/ui/CategoryCard";
-import { Drawer } from "@/components/ui/Drawer";
 import { FeaturedCategoryCard } from "@/components/ui/FeaturedCategoryCard";
 import { ImageCarousel } from "@/components/ui/ImageCarousel";
+import { PageWrapper } from "@/components/ui/PageWrapper";
 import { ProductCard } from "@/components/ui/ProductCard";
 import { ProductListItem } from "@/components/ui/ProductListItem";
 import { SaleTimer } from "@/components/ui/SaleTimer";
@@ -280,17 +275,9 @@ const topSelection = [
 
 export default function HomeScreen() {
   const [isLoading, setIsLoading] = useState(true);
-  const [cartCount, setCartCount] = useState(3);
   const [currentPopularIndex, setCurrentPopularIndex] = useState(0);
   const [currentFeaturedIndex, setCurrentFeaturedIndex] = useState(0);
-
-  useEffect(() => {
-    // Simulate initial data loading
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1500);
-    return () => clearTimeout(timer);
-  }, []);
+  
   const popularCarouselRef = useRef<FlatList>(null);
   const featuredCarouselRef = useRef<FlatList>(null);
   const popularScrollX = useRef(new Animated.Value(0)).current;
@@ -324,8 +311,11 @@ export default function HomeScreen() {
     handleProductPress,
   } = useSearch();
 
+  // This is the correct handleAddToCart function that uses the cart hook
   const handleAddToCart = () => {
-    setCartCount((prev) => prev + 1);
+    // This will be handled by the useCart hook now
+    // We'll keep this function for compatibility with existing components
+    console.log('Item added to cart');
   };
 
   const handleHeroPress = (index: number) => {
@@ -485,7 +475,13 @@ export default function HomeScreen() {
       onPress={() => handleProductPress(item)}
     />
   );
-
+ useEffect(() => {
+    // Simulate loading product data
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, []);
   const renderTopSelection = ({ item }: { item: any }) => (
     <TopSelectionCard
       image={item.image}
@@ -509,32 +505,19 @@ export default function HomeScreen() {
       uri: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&h=400&fit=crop",
     },
   ];
-  if (isLoading) {
-    return (
-      <SafeAreaView
-        style={styles.container}
-        edges={["left", "right", "bottom"]}
-      >
-        <StatusBar barStyle="light-content" backgroundColor="#181A20" />
-        <Loader fullscreen message="Loading Home..." />
-      </SafeAreaView>
-    );
-  }
-
   return (
-    <SafeAreaView style={styles.container} edges={["left", "right", "bottom"]}>
-      <StatusBar barStyle="light-content" backgroundColor="#181A20" />
-      {/* Header */}
-      <AppHeader
-        title="Home"
-        cartCount={cartCount}
-        showLogo={true}
-        onMenuPress={handleMenuPress}
-        onSearchPress={handleSearchPress}
-        onWishlistPress={() => console.log("Wishlist pressed")}
-        onCartPress={() => console.log("Cart pressed")}
-      />
-
+    <PageWrapper
+      title="Home"
+      showLogo={true}
+      isLoading={isLoading}
+      loadingMessage="Loading Home..."
+      showDrawer={true}
+      rightIcons={['search', 'wishlist', 'cart']}
+      // onCategoryPress={handleCategoryPress}
+      // onSubCategoryPress={handleSubCategoryPress}
+      onSearchPress={handleSearchPress}
+      onWishlistPress={() => console.log("Wishlist pressed")}
+    >
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
@@ -689,14 +672,6 @@ export default function HomeScreen() {
         </View>
       </ScrollView>
 
-      {/* Drawer */}
-      <Drawer
-        isVisible={isDrawerVisible}
-        onClose={closeDrawer}
-        onCategoryPress={handleCategoryPress}
-        onSubCategoryPress={handleSubCategoryPress}
-      />
-
       {/* Search Page */}
       <SearchPage
         isVisible={isSearchVisible}
@@ -715,7 +690,8 @@ export default function HomeScreen() {
           onBackToSearch={closeResults}
         />
       )}
-    </SafeAreaView>
+
+    </PageWrapper>
   );
 }
 

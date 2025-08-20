@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react';
+import { useCart } from '@/contexts/CartContext';
 
 interface ProductColor {
   id: string;
@@ -9,6 +10,8 @@ interface ProductColor {
 interface ProductImage {
   id: string;
   uri: string;
+  type?: 'image' | 'video';
+  thumbnail?: string;
 }
 
 interface ProductData {
@@ -30,6 +33,7 @@ interface ProductData {
 }
 
 export const useProductDetails = (initialProduct: ProductData) => {
+  const { addToCart } = useCart();
   const [selectedColor, setSelectedColor] = useState(initialProduct.colors[0]?.id || '');
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
@@ -46,16 +50,34 @@ export const useProductDetails = (initialProduct: ProductData) => {
   const handleAddToCart = useCallback(async () => {
     setIsAddingToCart(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      console.log('Added to cart:', initialProduct.title, 'Color:', selectedColor);
-      // Here you would typically make an API call to add to cart
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Get selected color data
+      const selectedColorData = initialProduct.colors.find(color => color.id === selectedColor);
+      
+      // Create cart item from product data
+      const cartItem = {
+        id: initialProduct.id,
+        title: initialProduct.title,
+        image: { uri: initialProduct.images[0]?.uri || '' },
+        price: initialProduct.currentPrice,
+        originalPrice: initialProduct.originalPrice,
+        quantity: 1,
+        selectedColor: selectedColor,
+        colorName: selectedColorData?.name || 'Default'
+      };
+      
+      // Add to cart using the cart hook
+      addToCart(cartItem);
+      
+      console.log('Added to cart:', initialProduct.title, 'Color:', selectedColorData?.name || 'Default');
     } catch (error) {
       console.error('Failed to add to cart:', error);
     } finally {
       setIsAddingToCart(false);
     }
-  }, [initialProduct.title, selectedColor]);
+  }, [initialProduct, selectedColor, addToCart]);
 
   const handleImagePress = useCallback((index: number) => {
     setCurrentImageIndex(index);
