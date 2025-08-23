@@ -1,17 +1,30 @@
-import React, { ReactNode } from 'react';
-import { StatusBar, StyleSheet, View } from 'react-native';
-import { router } from 'expo-router';
-import { SafeAreaView } from '@/components/ui/SafeAreaProvider';
-import { AppHeader } from '@/components/ui/AppHeader';
-import { Loader } from '@/components/ui/Loader';
-import { CartDrawer } from '@/components/ui/CartDrawer';
-import { Drawer } from '@/components/ui/Drawer';
-import { useCart } from '@/contexts/CartContext';
-import { useDrawer } from '@/hooks/useDrawer';
-import { useState } from 'react';
+import { CartDrawer } from "@/components/ui/CartDrawer";
+import { CustomBottomTabBar } from "@/components/ui/CustomBottomTabBar";
+import { Drawer } from "@/components/ui/Drawer";
+import { Loader } from "@/components/ui/Loader";
+import { SafeAreaView } from "@/components/ui/SafeAreaProvider";
+import { useCart } from "@/contexts/CartContext";
+import { useDrawer } from "@/hooks/useDrawer";
+import { router, usePathname } from "expo-router";
+import React, { ReactNode, useEffect, useState } from "react";
+import { StatusBar, StyleSheet, View } from "react-native";
+import { Header } from "./Header";
 
-type RightIconType = 'search' | 'wishlist' | 'cart';
-type LeftIconType = 'menu' | 'back';
+// Import types from Drawer component
+interface SubCategory {
+  id: string;
+  name: string;
+}
+
+interface Category {
+  id: string;
+  name: string;
+  icon: string;
+  subCategories: SubCategory[];
+}
+
+type RightIconType = "search" | "wishlist" | "cart";
+type LeftIconType = "menu" | "back";
 
 interface PageWrapperProps {
   children?: ReactNode;
@@ -19,17 +32,15 @@ interface PageWrapperProps {
   showLogo?: boolean;
   isLoading?: boolean;
   loadingMessage?: string;
-  leftIcon?: LeftIconType;
-  onLeftIconPress?: () => void; // Optional - component handles smart navigation by default
+  leftIcon?: LeftIconType; // Optional - component handles smart navigation by default
   onSearchPress?: () => void;
   onWishlistPress?: () => void;
   rightIcons?: RightIconType[];
   showHeader?: boolean;
-  edges?: ('top' | 'bottom' | 'left' | 'right')[];
-  // Drawer props
-  showDrawer?: boolean;
-  onCategoryPress?: (categoryId: string) => void;
-  onSubCategoryPress?: (categoryId: string, subCategoryId: string) => void;
+  showBottomNav?: boolean; // Control bottom navigation visibility
+  edges?: ("top" | "bottom" | "left" | "right")[];
+  onCategoryPress?: (category: Category) => void;
+  onSubCategoryPress?: (category: Category, subCategory: SubCategory) => void;
 }
 
 export const PageWrapper: React.FC<PageWrapperProps> = ({
@@ -37,19 +48,19 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({
   title,
   showLogo = false,
   isLoading = false,
-  loadingMessage = 'Loading...',
-  leftIcon = 'menu',
-  onLeftIconPress,
+  loadingMessage = "Loading...",
+  leftIcon = "menu",
   onSearchPress,
   onWishlistPress,
-  rightIcons = [ 'cart'],
+  rightIcons = ["cart"],
   showHeader = true,
-  edges = ['left', 'right', 'bottom', 'top'],
-  showDrawer = false,
+  showBottomNav = true,
+  edges = ["left", "right", "bottom", "top"],
   onCategoryPress,
   onSubCategoryPress,
 }) => {
-  const { getCartCount, isCartVisible, openCart, closeCart, checkout } = useCart();
+  const { getCartCount, isCartVisible, openCart, closeCart, checkout } =
+    useCart();
   const {
     isDrawerVisible,
     openDrawer,
@@ -57,48 +68,76 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({
     handleCategoryPress,
     handleSubCategoryPress,
   } = useDrawer();
+  
+  // Bottom navigation state management
+  const pathname = usePathname();
+  const [activeTab, setActiveTab] = useState('home');
+  
+  // Update active tab based on current route
+  useEffect(() => {
+    if (pathname === '/') {
+      setActiveTab('home');
+    } else if (pathname === '/categories') {
+      setActiveTab('categories');
+    } else if (pathname === '/wishlist') {
+      setActiveTab('wishlist');
+    } else if (pathname === '/profile') {
+      setActiveTab('profile');
+    }
+  }, [pathname]);
 
-
+  const handleTabPress = (tabId: string) => {
+    setActiveTab(tabId);
+    
+    // Navigate to the appropriate screen
+    switch (tabId) {
+      case 'home':
+        router.push('/');
+        break;
+      case 'categories':
+        router.push('/categories');
+        break;
+      case 'wishlist':
+        router.push('/wishlist');
+        break;
+      case 'profile':
+        router.push('/profile');
+        break;
+    }
+  };
 
   const handleLeftIconPress = () => {
-    // If custom handler is provided, use it first
-    if (onLeftIconPress) {
-      onLeftIconPress();
-      return;
-    }
 
     // Smart default behavior based on icon type
-    if (leftIcon === 'menu') {
-      if (showDrawer) {
-        openDrawer();
-      } else {
-        // Default menu behavior - could open a global menu or drawer
-        console.log('Menu pressed - no drawer configured');
-      }
-    } else if (leftIcon === 'back') {
+    if (leftIcon === "menu") {
+      openDrawer();
+    } else if (leftIcon === "back") {
       // Smart back navigation
       if (router.canGoBack()) {
         router.back();
       } else {
         // Fallback to home if no back history
-        router.replace('/(tabs)/');
+        router.replace("/");
       }
     }
   };
 
-  const handleCategoryPressInternal = (categoryId: string) => {
+  const handleCategoryPressInternal = (category: Category) => {
     if (onCategoryPress) {
-      onCategoryPress(categoryId);
+      onCategoryPress(category);
     } else {
-      handleCategoryPress(categoryId);
+      handleCategoryPress(category);
     }
   };
 
-  const handleSubCategoryPressInternal = (categoryId: string, subCategoryId: string) => {
+  const handleSubCategoryPressInternal = (
+    category: Category,
+    subCategory: SubCategory
+  ) => {
     if (onSubCategoryPress) {
-      onSubCategoryPress(categoryId, subCategoryId);
+      onSubCategoryPress(category, subCategory);
     } else {
-      handleSubCategoryPress(categoryId, subCategoryId);
+      handleSubCategoryPress(category, subCategory);
     }
   };
 
@@ -106,7 +145,7 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({
     if (onSearchPress) {
       onSearchPress();
     } else {
-      console.log('Search pressed');
+      console.log("Search pressed");
     }
   };
 
@@ -114,13 +153,16 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({
     if (onWishlistPress) {
       onWishlistPress();
     } else {
-      console.log('Wishlist pressed');
+      console.log("Wishlist pressed");
     }
   };
 
   if (isLoading) {
     return (
-      <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
+      <SafeAreaView
+        style={styles.container}
+        edges={["left", "right", "bottom"]}
+      >
         <StatusBar barStyle="light-content" backgroundColor="#181A20" />
         <Loader fullscreen message={loadingMessage} />
       </SafeAreaView>
@@ -130,33 +172,43 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({
   return (
     <SafeAreaView style={styles.container} edges={edges}>
       <StatusBar barStyle="light-content" backgroundColor="#181A20" />
-      
       {showHeader && (
-        <AppHeader
-          title={title}
-          cartCount={getCartCount()}
-          showLogo={showLogo}
-          leftIcon={leftIcon}
-          onLeftIconPress={handleLeftIconPress}
-          onSearchPress={handleSearchPress}
-          onWishlistPress={handleWishlistPress}
-          onCartPress={openCart}
-          rightIcons={rightIcons}
-        />
+        <>
+          <Header
+            title={title}
+            cartCount={getCartCount()}
+            showLogo={showLogo}
+            leftIcon={leftIcon}
+            onLeftIconPress={handleLeftIconPress}
+            onSearchPress={handleSearchPress}
+            onWishlistPress={handleWishlistPress}
+            onCartPress={openCart}
+            rightIcons={rightIcons}
+          />
+        </>
       )}
-      
-      <View style={styles.content}>
-        {children}
-      </View>
-      
-      <CartDrawer isVisible={isCartVisible} onClose={closeCart} onCheckout={checkout} />
-      
-      {showDrawer && (
+
+      <View style={styles.content}>{children}</View>
+
+      <CartDrawer
+        isVisible={isCartVisible}
+        onClose={closeCart}
+        onCheckout={checkout}
+      />
+
+      {isDrawerVisible && (
         <Drawer
           isVisible={isDrawerVisible}
           onClose={closeDrawer}
           onCategoryPress={handleCategoryPressInternal}
           onSubCategoryPress={handleSubCategoryPressInternal}
+        />
+      )}
+      
+      {showBottomNav && (
+        <CustomBottomTabBar
+          activeTab={activeTab}
+          onTabPress={handleTabPress}
         />
       )}
     </SafeAreaView>
@@ -166,7 +218,7 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#181A20',
+    backgroundColor: "#181A20",
   },
   content: {
     flex: 1,

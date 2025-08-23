@@ -88,12 +88,12 @@ export default function CategoryScreen() {
     <PageWrapper
       title="Fashion"
       showLogo={false}
-      showDrawer={true}
+
       onCategoryPress={handleCategoryPress}
       onSubCategoryPress={handleSubCategoryPress}
       onSearchPress={() => console.log('Search pressed')}
       onWishlistPress={() => console.log('Wishlist pressed')}
-      style={styles.container}
+     
     >
 
       <ScrollView

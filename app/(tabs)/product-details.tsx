@@ -363,16 +363,18 @@ export default function ProductDetailsScreen() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <PageWrapper
+      title={"Product-details"}
       leftIcon={"back"}
+      showBottomNav={false}
         // showHeader={false}
-        style={styles.container}
+        
       >
         {/* Header */}
-        <ProductDetailsHeader
+        {/* <ProductDetailsHeader
           onBackPress={handleBackPress}
           onWishlistPress={handleWishlistToggle}
           isWishlisted={isWishlisted}
-        />
+        /> */}
 
         <ScrollView
           style={styles.scrollView}

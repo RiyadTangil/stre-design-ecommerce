@@ -1,46 +1,8 @@
-import { Stack, usePathname, useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import { Stack } from 'expo-router';
+import React from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { CustomBottomTabBar } from '@/components/ui/CustomBottomTabBar';
-
-export default function TabLayout() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const [activeTab, setActiveTab] = useState('home');
-
-  // Update active tab based on current route
-  useEffect(() => {
-    if (pathname === '/') {
-      setActiveTab('home');
-    } else if (pathname === '/categories') {
-      setActiveTab('categories');
-    } else if (pathname === '/wishlist') {
-      setActiveTab('wishlist');
-    } else if (pathname === '/profile') {
-      setActiveTab('profile');
-    }
-  }, [pathname]);
-
-  const handleTabPress = (tabId: string) => {
-    setActiveTab(tabId);
-    
-    // Navigate to the appropriate screen
-    switch (tabId) {
-      case 'home':
-        router.push('/');
-        break;
-      case 'categories':
-        router.push('/categories');
-        break;
-      case 'wishlist':
-        router.push('/wishlist');
-        break;
-      case 'profile':
-        router.push('/profile');
-        break;
-    }
-  };
+const TabContent: React.FC = () => {
 
   return (
     <View style={styles.container}>
@@ -54,15 +16,12 @@ export default function TabLayout() {
         <Stack.Screen name="wishlist" />
         <Stack.Screen name="no" />
       </Stack>
-      
-      {!pathname.includes('product-details') && (
-        <CustomBottomTabBar
-          activeTab={activeTab}
-          onTabPress={handleTabPress}
-        />
-      )}
     </View>
   );
+};
+
+export default function TabLayout() {
+  return <TabContent />;
 }
 
 const styles = StyleSheet.create({

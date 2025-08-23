@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
+import { router } from 'expo-router';
+import React, { createContext, ReactNode, useCallback, useContext, useState } from 'react';
 
 export interface CartItem {
   id: string;
@@ -175,7 +176,9 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 
   const checkout = useCallback(() => {
     console.log('Proceeding to checkout with items:', cartItems);
-    // Implement checkout logic here
+    // Close cart drawer and navigate to checkout page
+    setIsCartVisible(false);
+    router.push('/(tabs)/checkout');
   }, [cartItems]);
 
   const value: CartContextType = {

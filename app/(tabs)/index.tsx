@@ -17,11 +17,11 @@ import { FeaturedCategoryCard } from "@/components/ui/FeaturedCategoryCard";
 import { ImageCarousel } from "@/components/ui/ImageCarousel";
 import { PageWrapper } from "@/components/ui/PageWrapper";
 import { ProductCard } from "@/components/ui/ProductCard";
+import { ProductGridCard } from "@/components/ui/ProductGridCard";
 import { ProductListItem } from "@/components/ui/ProductListItem";
 import { SaleTimer } from "@/components/ui/SaleTimer";
 import { SearchPage } from "@/components/ui/SearchPage";
 import { SearchResults } from "@/components/ui/SearchResults";
-import { TopSelectionCard } from "@/components/ui/TopSelectionCard";
 import { useDrawer } from "@/hooks/useDrawer";
 import { useSearch } from "@/hooks/useSearch";
 
@@ -240,36 +240,44 @@ const topSelection = [
     image: {
       uri: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=300&fit=crop",
     },
+    category: "Electronics",
     title: "Wired Earphones",
-    subtitle: "upto 50% off",
-    imageBackgroundColor: "#E5E5E5",
+    currentPrice: "৳25.00",
+    originalPrice: "৳50.00",
+    isWishlisted: false,
   },
   {
     id: "2",
     image: {
       uri: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=300&fit=crop",
     },
+    category: "Mobile",
     title: "Top Mobiles",
-    subtitle: "upto 50% off",
-    imageBackgroundColor: "#FFE5F0",
+    currentPrice: "৳15,999",
+    originalPrice: "৳31,999",
+    isWishlisted: true,
   },
   {
     id: "3",
     image: {
       uri: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=300&fit=crop",
     },
-    title: "Headphones",
-    subtitle: "upto 50% off",
-    imageBackgroundColor: "#E5E5E5",
+    category: "Audio",
+    title: "Premium Headphones",
+    currentPrice: "৳89.99",
+    originalPrice: "৳179.99",
+    isWishlisted: false,
   },
   {
     id: "4",
     image: {
       uri: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400&h=300&fit=crop",
     },
+    category: "Computers",
     title: "Best Laptops",
-    subtitle: "upto 50% off",
-    imageBackgroundColor: "#2A2A2A",
+    currentPrice: "৳45,999",
+    originalPrice: "৳91,999",
+    isWishlisted: false,
   },
 ];
 
@@ -483,12 +491,10 @@ export default function HomeScreen() {
     return () => clearTimeout(timer);
   }, []);
   const renderTopSelection = ({ item }: { item: any }) => (
-    <TopSelectionCard
-      image={item.image}
-      title={item.title}
-      subtitle={item.subtitle}
-      imageBackgroundColor={item.imageBackgroundColor}
-      onPress={() => handleProductPress(item)}
+    <ProductGridCard
+      item={item}
+      onPress={handleProductPress}
+      showWishlistButton={true}
     />
   );
   const heroImages = [
@@ -511,7 +517,7 @@ export default function HomeScreen() {
       showLogo={true}
       isLoading={isLoading}
       loadingMessage="Loading Home..."
-      showDrawer={true}
+
       rightIcons={['search', 'wishlist', 'cart']}
       // onCategoryPress={handleCategoryPress}
       // onSubCategoryPress={handleSubCategoryPress}
@@ -770,10 +776,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
   },
   topSelectionItem: {
-    width: "48%",
-    marginBottom: 20,
+    width: "50%",
+    // marginBottom: 20,
   },
 });

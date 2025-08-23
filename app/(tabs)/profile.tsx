@@ -78,7 +78,7 @@ export default function ProfileScreen() {
       showLogo={false}
       isLoading={isLoading}
       loadingMessage="Loading Profile..."
-      showDrawer={true}
+
       onCategoryPress={handleCategoryPress}
       onSubCategoryPress={handleSubCategoryPress}
       onSearchPress={() => console.log('Search pressed')}

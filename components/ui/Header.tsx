@@ -63,7 +63,7 @@ export const Header: React.FC<HeaderProps> = ({
         <View style={styles.leftSection}>
           <Pressable style={styles.menuButton} onPress={onLeftIconPress}>
             <Ionicons 
-              name={leftIcon === 'back' ? 'arrow-back' : 'menu'} 
+              name={leftIcon === 'back' ? 'chevron-back' : 'menu'} 
               size={24} 
               color="#F4F4F4" 
             />

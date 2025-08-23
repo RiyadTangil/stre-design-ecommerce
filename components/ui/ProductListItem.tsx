@@ -51,11 +51,15 @@ export const ProductListItem: React.FC<ProductListItemProps> = ({
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    paddingVertical: 16,
+    paddingVertical: 10,
     paddingHorizontal: 10,
     borderBottomWidth: 1,
     marginBottom: 10,
     borderRadius: 16,
+    alignItems: "center",
+   
+
+
     // borderBottomColor: '#23262F',
     backgroundColor: "#23262F",
   },
@@ -78,7 +82,7 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 12,
     color: "#FF6B9D",
-    marginBottom: 10,
+    marginBottom: 5,
   },
   discount: {
     fontSize: 12,

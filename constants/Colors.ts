@@ -37,6 +37,8 @@ export const Colors = {
     veryLightGrey: "#F8F8F8",
     gradientEnd: "#FFFFFF",
     white: "#FFFFFF",
+    borderLightWhite: "rgba(255, 255, 255, 0.1)",
+    bgWhite: "#1C212E",
     tabIconDefault: "#9BA1A6",
     lightPink: "#FFB6C1",
     darkPink: "#FF1493",

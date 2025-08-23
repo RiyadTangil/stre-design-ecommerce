@@ -120,6 +120,7 @@ export default function CategoriesScreen() {
       showLogo={false}
       leftIcon="back"
       onLeftIconPress={() => console.log('Back pressed')}
+
       showDrawer={true}
       onCategoryPress={handleCategoryPress}
       onSubCategoryPress={handleSubCategoryPress}

@@ -13,8 +13,8 @@ import {
 } from 'react-native';
 
 import { ImageWithFallback } from '@/components/ui/ImageWithFallback';
-import { ProductGridCard } from '@/components/ui/ProductGridCard';
 import { PageWrapper } from '@/components/ui/PageWrapper';
+import { ProductGridCard } from '@/components/ui/ProductGridCard';
 
 // Mock data for wishlist items based on the image
 const wishlistItems = [
@@ -223,10 +223,8 @@ export default function WishlistScreen() {
       showLogo={false}
       isLoading={isLoading}
       loadingMessage="Loading Wishlist..."
+
       leftIcon="back"
-      onLeftIconPress={handleBackPress}
-      onSearchPress={() => console.log('Search pressed')}
-      onWishlistPress={() => console.log('Wishlist pressed')}
     >
       {/* Custom Header Actions */}
       <View style={styles.header}>

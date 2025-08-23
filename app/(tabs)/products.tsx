@@ -1,7 +1,7 @@
+import { PageWrapper } from "@/components/ui/PageWrapper";
 import { ProductGridCard } from "@/components/ui/ProductGridCard";
-import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Dimensions,
@@ -12,7 +12,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { PageWrapper } from "@/components/ui/PageWrapper";
 import { Colors } from "../../constants/Colors";
 const { height } = Dimensions.get('window')
 const POPULAR_PRODUCTS = [
@@ -439,7 +438,6 @@ export default function ProductsScreen() {
       title="Products"
       showLogo={false}
       leftIcon="back"
-      onLeftIconPress={() => router.back()}
     >
       <View style={styles.container}>
         {/* Tab Navigation */}

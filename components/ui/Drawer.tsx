@@ -129,18 +129,18 @@ const CategoryItem: React.FC<{
   category: Category;
   onPress: (category: Category) => void;
   onSubCategoryPress: (category: Category, subCategory: SubCategory) => void;
-}> = ({ category, onPress, onSubCategoryPress }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+  isExpanded: boolean;
+  onToggleExpanded: (categoryId: string) => void;
+}> = ({ category, onPress, onSubCategoryPress, isExpanded, onToggleExpanded }) => {
   const [animation] = useState(new Animated.Value(0));
 
-  const toggleExpanded = () => {
-    setIsExpanded(!isExpanded);
+  useEffect(() => {
     Animated.timing(animation, {
-      toValue: isExpanded ? 0 : 1,
+      toValue: isExpanded ? 1 : 0,
       duration: 300,
       useNativeDriver: false,
     }).start();
-  };
+  }, [isExpanded, animation]);
 
   const maxHeight = animation.interpolate({
     inputRange: [0, 1],
@@ -153,7 +153,7 @@ const CategoryItem: React.FC<{
         style={styles.categoryHeader}
         onPress={() => {
           if (category.subCategories.length > 0) {
-            toggleExpanded();
+            onToggleExpanded(category.id);
           } else {
             onPress(category);
           }
@@ -197,6 +197,11 @@ export const Drawer: React.FC<DrawerProps> = ({
 }) => {
   const insets = useSafeArea();
   const [isLoading, setIsLoading] = useState(true);
+  const [expandedCategoryId, setExpandedCategoryId] = useState<string | null>(null);
+
+  const handleToggleExpanded = (categoryId: string) => {
+    setExpandedCategoryId(expandedCategoryId === categoryId ? null : categoryId);
+  };
   
   useEffect(() => {
     // Simulate loading time
@@ -243,6 +248,8 @@ export const Drawer: React.FC<DrawerProps> = ({
               category={category}
               onPress={onCategoryPress}
               onSubCategoryPress={onSubCategoryPress}
+              isExpanded={expandedCategoryId === category.id}
+              onToggleExpanded={handleToggleExpanded}
             />
           ))}
         </ScrollView>
@@ -391,4 +398,4 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingHorizontal: 20,
   },
-}); 
+});

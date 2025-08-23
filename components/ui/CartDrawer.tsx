@@ -1,3 +1,5 @@
+import { Colors } from "@/constants/Colors";
+import { useCart } from "@/contexts/CartContext";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
 import {
@@ -10,9 +12,7 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { Colors } from "@/constants/Colors";
 import { useSafeArea } from "./SafeAreaProvider";
-import { useCart } from "@/contexts/CartContext";
 
 interface CartDrawerProps {
   isVisible: boolean;
@@ -115,7 +115,8 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
             </View>
             <Text style={styles.emptyCartTitle}>Your cart is empty</Text>
             <Text style={styles.emptyCartSubtitle}>
-              Looks like you haven 't added anything to your cart yet.
+              Looks like you have not added anything to your cart yet.
+
             </Text>
             <Text style={styles.emptyCartSubtitle}>
               Start shopping to fill it up!
