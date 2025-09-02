@@ -1,20 +1,20 @@
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  Image,
-  Alert,
-  Modal,
-  TextInput,
-} from 'react-native';
-import { Ionicons, MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
-import { router } from 'expo-router';
 import { PageWrapper } from '@/components/ui/PageWrapper';
 import { Colors } from '@/constants/Colors';
 import { useCart } from '@/contexts/CartContext';
+import { FontAwesome5, Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { router } from 'expo-router';
+import React, { useState } from 'react';
+import {
+  Alert,
+  Image,
+  Modal,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
 // Payment method types
 type PaymentMethod = 'card' | 'cash' | 'googlepay' | 'paytm' | 'wallet' | 'netbanking';
@@ -71,29 +71,42 @@ export default function PaymentPage() {
     setExpandedSection(section === expandedSection ? null : section);
   };
 
+  // Import auth context at the top of the file
+  const { useAuth } = require('@/contexts/AuthContext');
+  const { isAuthenticated } = useAuth();
+
   // Handle payment
   const handlePayment = () => {
-    Alert.alert(
-      'Order Placed',
-      'Your order has been placed successfully!',
-      [
-        {
-          text: 'View Order',
-          onPress: () => {
-            // Navigate to orders page
-            console.log('Navigate to orders page');
-          },
-        },
-        {
-          text: 'Continue Shopping',
-          onPress: () => {
-            // Navigate to home
-            router.replace('/');
-          },
-          style: 'cancel',
-        },
-      ]
-    );
+    router.push('/auth/login');
+    // Check if user is authenticated
+    if (!isAuthenticated) {
+      // Redirect to login page if not authenticated
+      router.push('/auth/login');
+      return;
+    }
+    
+    // If authenticated, proceed with payment
+    // Alert.alert(
+    //   'Order Placed',
+    //   'Your order has been placed successfully!',
+    //   [
+    //     {
+    //       text: 'View Order',
+    //       onPress: () => {
+    //         // Navigate to orders page
+    //         console.log('Navigate to orders page');
+    //       },
+    //     },
+    //     {
+    //       text: 'Continue Shopping',
+    //       onPress: () => {
+    //         // Navigate to home
+    //         router.replace('/');
+    //       },
+    //       style: 'cancel',
+    //     },
+    //   ]
+    // );
   };
 
   // Open add card modal

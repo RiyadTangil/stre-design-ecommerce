@@ -483,6 +483,9 @@ export default function HomeScreen() {
       onPress={() => handleProductPress(item)}
     />
   );
+  const fetchNetworkCall=async()=>{
+    const response=await fetch("url",{method:"GET",headers:{},body:JSON.stringify({name:"riyad"})})
+  }
  useEffect(() => {
     // Simulate loading product data
     const timer = setTimeout(() => {
@@ -493,6 +496,7 @@ export default function HomeScreen() {
   const renderTopSelection = ({ item }: { item: any }) => (
     <ProductGridCard
       item={item}
+      txHight={22}
       onPress={handleProductPress}
       showWishlistButton={true}
     />
@@ -517,7 +521,6 @@ export default function HomeScreen() {
       showLogo={true}
       isLoading={isLoading}
       loadingMessage="Loading Home..."
-
       rightIcons={['search', 'wishlist', 'cart']}
       // onCategoryPress={handleCategoryPress}
       // onSubCategoryPress={handleSubCategoryPress}
@@ -530,7 +533,6 @@ export default function HomeScreen() {
         contentContainerStyle={styles.scrollContent}
       >
         {/* Hero Banner */}
-
         <ImageCarousel
           images={heroImages}
           height={200}
@@ -578,6 +580,17 @@ export default function HomeScreen() {
               horizontal
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.horizontalList}
+              getItemLayout={(data, index) => ({
+                length: 172,
+                offset: 172 * index,
+                index,
+              })}
+              onScrollToIndexFailed={(info) => {
+                const wait = new Promise(resolve => setTimeout(resolve, 500));
+                wait.then(() => {
+                  popularCarouselRef.current?.scrollToIndex({ index: info.index, animated: true });
+                });
+              }}
               onScroll={Animated.event(
                 [{ nativeEvent: { contentOffset: { x: popularScrollX } } }],
                 { useNativeDriver: false }
@@ -613,6 +626,17 @@ export default function HomeScreen() {
               horizontal
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.horizontalList}
+              getItemLayout={(data, index) => ({
+                length: 172,
+                offset: 172 * index,
+                index,
+              })}
+              onScrollToIndexFailed={(info) => {
+                const wait = new Promise(resolve => setTimeout(resolve, 500));
+                wait.then(() => {
+                  featuredCarouselRef.current?.scrollToIndex({ index: info.index, animated: true });
+                });
+              }}
               onScroll={Animated.event(
                 [{ nativeEvent: { contentOffset: { x: featuredScrollX } } }],
                 { useNativeDriver: false }
@@ -663,7 +687,7 @@ export default function HomeScreen() {
         </View>
 
         {/* Top Selection */}
-        <View style={[styles.section, styles.topSelectionSection]}>
+        <View style={[styles.section]}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Top Selection</Text>
           </View>
@@ -696,16 +720,12 @@ export default function HomeScreen() {
           onBackToSearch={closeResults}
         />
       )}
-
     </PageWrapper>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#181A20",
-  },
+ 
   scrollView: {
     flex: 1,
   },
@@ -713,7 +733,7 @@ const styles = StyleSheet.create({
     paddingBottom: 100, // Space for bottom tab bar
   },
   categoriesContainer: {
-    backgroundColor: "#23262F",
+    
     paddingVertical: 16,
   },
   categoriesGrid: {
@@ -750,36 +770,23 @@ const styles = StyleSheet.create({
     position: "relative",
     marginBottom: 20,
   },
-  paginationContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 16,
-    paddingHorizontal: 20,
-  },
-  paginationDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    marginHorizontal: 4,
-  },
+ 
+ 
   featuredCategoriesSection: {
     borderTopWidth: 1,
     borderTopColor: "#2A2D35",
     borderBottomWidth: 1,
     borderBottomColor: "#2A2D35",
   },
-  topSelectionSection: {
-    backgroundColor: "#2F2F2F",
-  },
+ 
   topSelectionGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
     paddingHorizontal: 10,
+    gap: 10,
   },
   topSelectionItem: {
-    width: "50%",
-    // marginBottom: 20,
+    width: "48%",
   },
 });

@@ -9,7 +9,7 @@ interface FeaturedCategoryCardProps {
   onPress?: () => void;
 }
 
-export const FeaturedCategoryCard: React.FC<FeaturedCategoryCardProps> = ({
+export const FeaturedCategoryCard: React.FC<FeaturedCategoryCardProps> = React.memo(({
   image,
   title,
   subtitle,
@@ -29,7 +29,7 @@ export const FeaturedCategoryCard: React.FC<FeaturedCategoryCardProps> = ({
       </View>
     </Pressable>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {
@@ -71,4 +71,4 @@ const styles = StyleSheet.create({
     color: '#A0A0A0',
     textAlign: 'center',
   },
-}); 
+});

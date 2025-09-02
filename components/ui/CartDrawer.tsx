@@ -18,12 +18,14 @@ interface CartDrawerProps {
   isVisible: boolean;
   onClose: () => void;
   onCheckout: () => void;
+  showBottomNav?: boolean;
 }
 
 export const CartDrawer: React.FC<CartDrawerProps> = ({
   isVisible,
   onClose,
   onCheckout,
+  showBottomNav = true,
 }) => {
   const insets = useSafeArea();
   const { 
@@ -98,7 +100,11 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
       <Animated.View
         style={[
           styles.drawer,
-          { paddingTop: insets.top, transform: [{ translateX: slideAnim }] },
+          { 
+            paddingTop: insets.top, 
+            paddingBottom: showBottomNav ? 80 : 20,
+            transform: [{ translateX: slideAnim }] 
+          },
         ]}
       >
         <View style={styles.header}>
@@ -142,20 +148,31 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                     <Text style={styles.itemColor}>Color: {item.colorName}</Text>
                   )}
                   <View style={styles.priceContainer}>
-                    <Text style={styles.itemPrice}>{item.price}</Text>
-                    <Text style={styles.itemOriginalPrice}>
-                      {item.originalPrice}
+                    <Text style={styles.itemUnitQty}>{item.price} × {item.quantity}</Text>
+                    <Text style={styles.itemTotalPrice}>
+                      ৳{(parseFloat(item.price.replace(/[৳,]/g, '')) * item.quantity).toFixed(2)}
                     </Text>
                   </View>
                 </View>
                 <View style={styles.quantityControls}>
                   <Pressable
-                    style={styles.quantityButton}
-                    onPress={() =>
-                      handleDecreaseQuantity(item.id, item.selectedColor)
-                    }
+                    style={[
+                      styles.quantityButton,
+                      item.quantity === 1 && styles.removeButton
+                    ]}
+                    onPress={() => {
+                      if (item.quantity === 1) {
+                        handleRemoveItem(item.id, item.selectedColor);
+                      } else {
+                        handleDecreaseQuantity(item.id, item.selectedColor);
+                      }
+                    }}
                   >
-                    <Text style={styles.quantityButtonText}>-</Text>
+                    {item.quantity === 1 ? (
+                      <Ionicons name="close" size={16} color="#FF6B6B" />
+                    ) : (
+                      <Text style={styles.quantityButtonText}>-</Text>
+                    )}
                   </Pressable>
                   <Text style={styles.quantityText}>{item.quantity}</Text>
                   <Pressable
@@ -289,7 +306,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#181A20",
     borderLeftWidth: 1,
     borderLeftColor: "#23262F",
-    paddingBottom: 20,
   },
   header: {
     flexDirection: "row",
@@ -335,8 +351,12 @@ const styles = StyleSheet.create({
   cartItem: {
     flexDirection: "row",
     padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#23262F",
+    backgroundColor: "#1D1F27",
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#23262F",
+    marginHorizontal: 12,
+    marginVertical: 8,
   },
   itemImage: {
     width: 60,
@@ -367,6 +387,8 @@ const styles = StyleSheet.create({
   priceContainer: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-between",
+    marginTop: 6,
   },
   itemPrice: {
     fontSize: 14,
@@ -374,10 +396,19 @@ const styles = StyleSheet.create({
     color: "#F4F4F4",
     marginRight: 8,
   },
+  itemUnitQty: {
+    fontSize: 12,
+    color: "#A0A0A0",
+  },
   itemOriginalPrice: {
     fontSize: 12,
     color: "#A0A0A0",
     textDecorationLine: "line-through",
+  },
+  itemTotalPrice: {
+    fontSize: 12,
+    color: Colors.product.accentPink,
+    fontWeight: "600",
   },
   quantityControls: {
     flexDirection: "row",
@@ -392,6 +423,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#23262F",
     justifyContent: "center",
     alignItems: "center",
+  },
+  removeButton: {
+    backgroundColor: "#2A1A1A",
+    borderWidth: 1,
+    borderColor: "#FF6B6B",
   },
   quantityButtonText: {
     fontSize: 16,

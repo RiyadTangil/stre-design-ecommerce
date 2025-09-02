@@ -15,6 +15,8 @@ const TabContent: React.FC = () => {
         <Stack.Screen name="categories" />
         <Stack.Screen name="wishlist" />
         <Stack.Screen name="no" />
+        <Stack.Screen name="orders" />
+        <Stack.Screen name="order-tracking" />
       </Stack>
     </View>
   );

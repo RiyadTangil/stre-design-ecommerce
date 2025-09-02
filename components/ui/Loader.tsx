@@ -9,6 +9,7 @@ import {
     ViewStyle,
 } from 'react-native';
 import { ThemedText } from '../ThemedText';
+import { Colors } from '../../constants/Colors';
 
 interface LoaderProps {
   size?: 'small' | 'large';
@@ -21,34 +22,54 @@ interface LoaderProps {
 
 export const Loader: React.FC<LoaderProps> = ({
   size = 'large',
-  color = '#007AFF',
+  color = Colors.product.accentPink,
   message,
   fullscreen = false,
   overlay = false,
   style,
 }) => {
-  const [rotation] = React.useState(new Animated.Value(0));
+  const [wave1] = React.useState(new Animated.Value(0));
+  const [wave2] = React.useState(new Animated.Value(0));
+  const [wave3] = React.useState(new Animated.Value(0));
+  const [wave4] = React.useState(new Animated.Value(0));
 
   React.useEffect(() => {
-    const startRotation = () => {
-      Animated.loop(
-        Animated.timing(rotation, {
-          toValue: 1,
-          duration: 1500,
-          easing: Easing.linear,
-          useNativeDriver: true,
-        })
-      ).start();
+    const createWaveAnimation = (animatedValue: Animated.Value, delay: number) => {
+      return Animated.loop(
+        Animated.sequence([
+          Animated.delay(delay),
+          Animated.timing(animatedValue, {
+            toValue: 1,
+            duration: 2000,
+            easing: Easing.out(Easing.quad),
+            useNativeDriver: true,
+          }),
+          Animated.timing(animatedValue, {
+            toValue: 0,
+            duration: 0,
+            useNativeDriver: true,
+          }),
+        ])
+      );
     };
 
-    startRotation();
-    return () => rotation.setValue(0);
-  }, [rotation]);
+    const animations = [
+      createWaveAnimation(wave1, 0),
+      createWaveAnimation(wave2, 500),
+      createWaveAnimation(wave3, 1000),
+      createWaveAnimation(wave4, 1500),
+    ];
 
-  const spin = rotation.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0deg', '360deg'],
-  });
+    animations.forEach(animation => animation.start());
+
+    return () => {
+      animations.forEach(animation => animation.stop());
+      wave1.setValue(0);
+      wave2.setValue(0);
+      wave3.setValue(0);
+      wave4.setValue(0);
+    };
+  }, [wave1, wave2, wave3, wave4]);
 
   const containerStyle = [
     styles.container,
@@ -57,30 +78,65 @@ export const Loader: React.FC<LoaderProps> = ({
     style,
   ];
 
-  const CustomLoader = () => (
-    <View style={styles.customLoader}>
-      <Animated.View
-        style={[
-          styles.spinnerRing,
-          {
-            transform: [{ rotate: spin }],
-            borderTopColor: color,
-          },
-        ]}
-      />
-    </View>
-  );
+  const WaveLoader = () => {
+    const createWaveStyle = (animatedValue: Animated.Value) => {
+      const scale = animatedValue.interpolate({
+        inputRange: [0, 1],
+        outputRange: [0, 4],
+      });
+
+      const opacity = animatedValue.interpolate({
+        inputRange: [0, 0.5, 1],
+        outputRange: [0.8, 0.4, 0],
+      });
+
+      return {
+        transform: [{ scale }],
+        opacity,
+      };
+    };
+
+    return (
+      <View style={styles.waveContainer}>
+        <Animated.View
+          style={[
+            styles.wave,
+            { backgroundColor: color },
+            createWaveStyle(wave1),
+          ]}
+        />
+        <Animated.View
+          style={[
+            styles.wave,
+            { backgroundColor: color },
+            createWaveStyle(wave2),
+          ]}
+        />
+        <Animated.View
+          style={[
+            styles.wave,
+            { backgroundColor: color },
+            createWaveStyle(wave3),
+          ]}
+        />
+        <Animated.View
+          style={[
+            styles.wave,
+            { backgroundColor: color },
+            createWaveStyle(wave4),
+          ]}
+        />
+        <View style={[styles.centerDot, { backgroundColor: color }]} />
+      </View>
+    );
+  };
 
   return (
     <View style={containerStyle}>
-      {Platform.OS === 'ios' ? (
-        <ActivityIndicator size={size} color={color} />
-      ) : (
-        <CustomLoader />
-      )}
-      {message && (
+      <WaveLoader />
+      {/* {message && (
         <ThemedText style={styles.message}>{message}</ThemedText>
-      )}
+      )} */}
     </View>
   );
 };
@@ -106,17 +162,25 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
   },
-  customLoader: {
-    width: 40,
-    height: 40,
+  waveContainer: {
+    width: 80,
+    height: 80,
     justifyContent: 'center',
     alignItems: 'center',
+    position: 'relative',
   },
-  spinnerRing: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 50,
-    borderWidth: 4,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+  wave: {
+    position: 'absolute',
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    opacity: 0.6,
+  },
+  centerDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    position: 'absolute',
+    zIndex: 10,
   },
 });

@@ -220,11 +220,8 @@ export default function WishlistScreen() {
   return (
     <PageWrapper
       title="Wishlist"
-      showLogo={false}
-      isLoading={isLoading}
-      loadingMessage="Loading Wishlist..."
+      showHeader={false}
 
-      leftIcon="back"
     >
       {/* Custom Header Actions */}
       <View style={styles.header}>

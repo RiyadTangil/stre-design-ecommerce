@@ -235,7 +235,7 @@ export const Drawer: React.FC<DrawerProps> = ({
         
         <View style={styles.logoContainer}>
           <Image
-            source={{ uri: 'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=400&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8bG9nb3xlbnwwfHwwfHx8MA%3D%3D' }}
+            source={{ uri: 'https://imarket.com.bd/assets/images/demos/demo12/logo1.webp' }}
             style={styles.logo}
           />
           {/* <Text style={styles.logoText}>Star Design</Text> */}
@@ -265,7 +265,7 @@ export const Drawer: React.FC<DrawerProps> = ({
               <Text style={styles.footerButtonText}>Help</Text>
             </Pressable>
           </View> */}
-          <Text style={styles.copyright}>
+          <Text style={[styles.copyright, { position: 'absolute', bottom: 20, left: 0, right: 0 }]}>
             © {new Date().getFullYear()} Star Design. All rights reserved.
           </Text>
         </View>
@@ -315,10 +315,13 @@ const styles = StyleSheet.create({
   logoContainer: {
     alignItems: 'center',
     paddingVertical: 16,
+    marginHorizontal: 20,
+    borderRadius:16,
+
     borderBottomWidth: 1,
     borderBottomColor: '#23262F',
-    backgroundColor: '#23262F',
-    marginBottom: 8,
+    backgroundColor: 'white',
+
   },
   logo: {
     width: '90%',

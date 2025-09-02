@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animated Water Drop Wave Loader Demo</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #181A20;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+        
+        .loader-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .wave-container {
+            width: 80px;
+            height: 80px;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .wave {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #FF6B9D;
+            opacity: 0.6;
+            animation: wave-animation 2s infinite;
+        }
+        
+        .wave:nth-child(1) {
+            animation-delay: 0s;
+        }
+        
+        .wave:nth-child(2) {
+            animation-delay: 0.5s;
+        }
+        
+        .wave:nth-child(3) {
+            animation-delay: 1s;
+        }
+        
+        .wave:nth-child(4) {
+            animation-delay: 1.5s;
+        }
+        
+        .center-dot {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #FF6B9D;
+            z-index: 10;
+        }
+        
+        @keyframes wave-animation {
+            0% {
+                transform: scale(0);
+                opacity: 0.8;
+            }
+            50% {
+                opacity: 0.4;
+            }
+            100% {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+        
+        .message {
+            color: #FFFFFF;
+            font-size: 16px;
+            text-align: center;
+            margin-top: 10px;
+        }
+        
+        .demo-info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #FFFFFF;
+            font-size: 14px;
+            max-width: 300px;
+        }
+        
+        .demo-info h3 {
+            margin: 0 0 10px 0;
+            color: #FF6B9D;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-info">
+        <h3>Animated Water Drop Wave Loader</h3>
+        <p>This loader creates a ripple effect with multiple animated circles that scale and fade out in sequence, creating a water drop wave effect.</p>
+        <p><strong>Features:</strong></p>
+        <ul>
+            <li>4 animated waves with staggered timing</li>
+            <li>Increased wave width (30px) for better visibility</li>
+            <li>Primary app color (#FF6B9D - Accent Pink)</li>
+            <li>Smooth scaling and opacity transitions</li>
+            <li>Larger center dot as focal point</li>
+            <li>Continuous loop animation</li>
+        </ul>
+    </div>
+    
+    <div class="loader-container">
+        <div class="wave-container">
+            <div class="wave"></div>
+            <div class="wave"></div>
+            <div class="wave"></div>
+            <div class="wave"></div>
+            <div class="center-dot"></div>
+        </div>
+        <div class="message">Loading...</div>
+    </div>
+</body>
+</html>

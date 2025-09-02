@@ -10,7 +10,7 @@ interface ProductCardProps {
   onPress?: () => void;
 }
 
-export const ProductCard: React.FC<ProductCardProps> = ({
+export const ProductCard: React.FC<ProductCardProps> = React.memo(({
   image,
   title,
   price,
@@ -38,7 +38,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       </View>
     </Pressable>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {
@@ -88,4 +88,4 @@ const styles = StyleSheet.create({
     color: '#A0A0A0',
     textDecorationLine: 'line-through',
   },
-}); 
+});

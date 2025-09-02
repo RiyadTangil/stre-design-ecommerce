@@ -14,7 +14,7 @@ interface ProductListItemProps {
   onAddToCart?: () => void;
 }
 
-export const ProductListItem: React.FC<ProductListItemProps> = ({
+export const ProductListItem: React.FC<ProductListItemProps> = React.memo(({
   image,
   title,
   description,
@@ -46,7 +46,7 @@ export const ProductListItem: React.FC<ProductListItemProps> = ({
       </Pressable>
     </Pressable>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {

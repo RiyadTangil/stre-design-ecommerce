@@ -21,17 +21,22 @@ interface ProductGridCardProps {
     originalPrice?: string;
     isWishlisted?: boolean;
     isFavorite?: boolean;
+   
   };
   onPress: (item: any) => void;
   onToggleWishlist?: (id: string) => void;
   showWishlistButton?: boolean;
+   children?: React.ReactNode;
+   txHight?: number;
 }
 
 export const ProductGridCard: React.FC<ProductGridCardProps> = ({
   item,
   onPress,
   onToggleWishlist,
-  showWishlistButton = true
+  showWishlistButton = true,
+  children,
+  txHight=44,
 }) => {
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
@@ -87,7 +92,7 @@ export const ProductGridCard: React.FC<ProductGridCardProps> = ({
         {item.category && (
           <Text style={styles.categoryText}>{item.category}</Text>
         )}
-        <Text style={styles.titleText} numberOfLines={2}>
+        <Text style={[styles.titleText,{ height: txHight}]} numberOfLines={2}>
           {item.title}
         </Text>
         <View style={styles.priceContainer}>
@@ -96,6 +101,7 @@ export const ProductGridCard: React.FC<ProductGridCardProps> = ({
             <Text style={styles.originalPrice}>{item.originalPrice}</Text>
           )}
         </View>
+        {children}
       </View>
     </Pressable>
   );
@@ -107,8 +113,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     borderRadius: 12,
     padding: 12,
-    flex: 1,
-    marginHorizontal: 5,
+    width: '100%',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -150,6 +155,7 @@ const styles = StyleSheet.create({
   },
   titleText: {
     fontSize: 12,
+
     fontWeight: '600',
     color: '#FFFFFF',
     lineHeight: 16,

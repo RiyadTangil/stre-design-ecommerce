@@ -1,27 +1,28 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import React, { useEffect, useRef, useState } from 'react';
 import {
-  View,
+  ActivityIndicator,
+  Dimensions,
   FlatList,
   Image,
-  StyleSheet,
-  Dimensions,
-  TouchableOpacity,
-  ActivityIndicator,
-  Pressable,
-  Text,
-  TouchableWithoutFeedback,
   Modal,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+  GestureResponderEvent,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 // Video support removed
-import { GestureHandlerRootView, PinchGestureHandler, TapGestureHandler, State } from 'react-native-gesture-handler';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSpring,
-  runOnJS,
-} from 'react-native-reanimated';
 import { Colors } from '@/constants/Colors';
+import { GestureHandlerRootView, PinchGestureHandler } from 'react-native-gesture-handler';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring
+} from 'react-native-reanimated';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const THUMBNAIL_SIZE = 64;
@@ -50,14 +51,16 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({
   const [hasError, setHasError] = useState<Record<string, boolean>>({});
   const [showPinchInstruction, setShowPinchInstruction] = useState(true);
   
-  const mainFlatListRef = useRef<FlatList>(null);
-  const thumbnailFlatListRef = useRef<FlatList>(null);
+  const mainFlatListRef = useRef<FlatList<MediaItem>>(null);
+  const thumbnailFlatListRef = useRef<FlatList<MediaItem>>(null);
   
-  // Remove this entire useEffect - it's causing the infinite loop
+  // Keep pinch instruction visible permanently
   useEffect(() => {
+    // We're removing the timeout to keep the instruction visible
+    // This ensures users always know they can tap to zoom
     setShowPinchInstruction(true);
   }, []);
-  
+
   // Calculate main image height based on screen width and aspect ratio
   const mainImageHeight = SCREEN_WIDTH / aspectRatio;
 
@@ -77,7 +80,7 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({
     });
   };
 
-  const handleScroll = (event: any) => {
+  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const contentOffset = event.nativeEvent.contentOffset.x;
     const index = Math.round(contentOffset / SCREEN_WIDTH);
     
@@ -119,7 +122,7 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({
             source={{ uri: item.uri }}
             style={styles.mainImage}
             resizeMode="cover"
-            // onLoadStart={() => handleImageLoadStart(item.id)}
+            onLoadStart={() => handleImageLoadStart(item.id)}
             onLoad={() => handleImageLoadSuccess(item.id)}
             onError={() => handleImageLoadError(item.id)}
           />
@@ -191,14 +194,12 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({
   const scale = useSharedValue(1);
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
-  const doubleTapRef = useRef(null);
-  const pinchRef = useRef(null);
-  const singleTapRef = useRef(null);
+  const pinchRef = useRef<any>(null);
   const [showControls, setShowControls] = useState(true);
   const [showZoomIndicator, setShowZoomIndicator] = useState(false);
-  const lastTap = useRef(0);
-  const tapPosition = useRef({ x: 0, y: 0 });
-  const zoomIndicatorTimeout = useRef<NodeJS.Timeout | null>(null);
+  const lastTap = useRef<number>(0);
+  const tapPosition = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  const zoomIndicatorTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   
   const pinchGestureHandler = (event: any) => {
     // Handle pinch/zoom with increased maximum zoom level for e-commerce product detail
@@ -309,7 +310,7 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({
       
       return () => clearTimeout(timer);
     }
-  }, [isImageViewVisible, showFullscreenInstruction]);
+  }, [isImageViewVisible]);
   
   // Enhanced manual double-tap detection for reliable zoom
   const handleImageTap = (event: any) => {

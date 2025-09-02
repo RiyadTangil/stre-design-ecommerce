@@ -1,12 +1,12 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import {
-  Platform,
   Pressable,
   StyleSheet,
   Text,
-  View,
+  View
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface TabItem {
   id: string;
@@ -51,8 +51,10 @@ export const CustomBottomTabBar: React.FC<CustomBottomTabBarProps> = ({
   activeTab,
   onTabPress,
 }) => {
+  const insets = useSafeAreaInsets();
+  
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingBottom: insets.bottom + 8 }]}>
       {tabs.map((tab) => {
         const isActive = activeTab === tab.id;
         const iconName = isActive ? tab.activeIcon || tab.icon : tab.icon;
@@ -95,7 +97,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#181A20',
     borderTopWidth: 1,
     borderTopColor: '#23262F',
-    paddingBottom: Platform.OS === 'ios' ? 20 : 10,
     paddingTop: 8,
     position: 'absolute',
     bottom: 0,
@@ -131,4 +132,4 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     textAlign: 'center',
   },
-}); 
+});

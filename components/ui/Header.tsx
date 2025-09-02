@@ -90,7 +90,7 @@ export const Header: React.FC<HeaderProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#181A20',
+    backgroundColor: '#d1454504',
     borderBottomWidth: 1,
     borderBottomColor: '#23262F',
   },

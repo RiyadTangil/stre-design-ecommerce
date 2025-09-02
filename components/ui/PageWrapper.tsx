@@ -8,7 +8,9 @@ import { useDrawer } from "@/hooks/useDrawer";
 import { router, usePathname } from "expo-router";
 import React, { ReactNode, useEffect, useState } from "react";
 import { StatusBar, StyleSheet, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Header } from "./Header";
+import { Colors } from "@/constants/Colors";
 
 // Import types from Drawer component
 interface SubCategory {
@@ -72,6 +74,9 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({
   // Bottom navigation state management
   const pathname = usePathname();
   const [activeTab, setActiveTab] = useState('home');
+  
+  // Move useSafeAreaInsets to top level to avoid hooks order violation
+  const insets = useSafeAreaInsets();
   
   // Update active tab based on current route
   useEffect(() => {
@@ -169,9 +174,11 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({
     );
   }
 
+  const contentPaddingStyle = showBottomNav ? { paddingBottom: insets.bottom + 64 } : null;
+
   return (
     <SafeAreaView style={styles.container} edges={edges}>
-      <StatusBar barStyle="light-content" backgroundColor="#181A20" />
+      <StatusBar barStyle="light-content" backgroundColor="#181a20ff" />
       {showHeader && (
         <>
           <Header
@@ -188,12 +195,13 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({
         </>
       )}
 
-      <View style={styles.content}>{children}</View>
+      <View style={[styles.content]}>{children}</View>
 
       <CartDrawer
         isVisible={isCartVisible}
         onClose={closeCart}
         onCheckout={checkout}
+        showBottomNav={showBottomNav}
       />
 
       {isDrawerVisible && (
@@ -218,7 +226,8 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#181A20",
+
+    backgroundColor: Colors.dark.mainBg,
   },
   content: {
     flex: 1,

@@ -8,7 +8,7 @@ interface CategoryCardProps {
   onPress?: () => void;
 }
 
-export const CategoryCard: React.FC<CategoryCardProps> = ({
+export const CategoryCard: React.FC<CategoryCardProps> = React.memo(({
   image,
   title,
   onPress,
@@ -27,7 +27,7 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
       <Text style={styles.title}>{title}</Text>
     </Pressable>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {
@@ -63,4 +63,4 @@ const styles = StyleSheet.create({
     color: '#F4F4F4',
     textAlign: 'center',
   },
-}); 
+});

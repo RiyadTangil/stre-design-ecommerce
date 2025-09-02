@@ -7,18 +7,27 @@ interface AddToCartButtonProps {
   text?: string;
   disabled?: boolean;
   loading?: boolean;
+  size?: number;
+
 }
 
-export const AddToCartButton: React.FC<AddToCartButtonProps> = ({
+export const ActionButton: React.FC<AddToCartButtonProps> = ({
   onPress,
   text = 'Add Cart',
   disabled = false,
   loading = false,
+  size = 10,
+
 }) => {
+  const dynamicStyles = {
+    paddingVertical: size,
+  };
+
   return (
     <Pressable
       style={[
         styles.button,
+        dynamicStyles,
         disabled && styles.buttonDisabled,
       ]}
       onPress={onPress}
@@ -35,7 +44,6 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: Colors.product.accentPink,
     paddingHorizontal: 32,
-    paddingVertical: 8,
     borderRadius: 25,
     alignItems: 'center',
     justifyContent: 'center',

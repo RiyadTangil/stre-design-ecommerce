@@ -4,21 +4,21 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Colors } from "@/constants/Colors";
 import { LinearGradient } from "expo-linear-gradient";
 import { router, useLocalSearchParams } from "expo-router";
-import React, { useEffect, useMemo, useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
+import { ScrollView, StyleSheet, Text, View, Pressable } from "react-native";
 
 // Import our reusable components
-import { AddToCartButton } from "@/components/ui/AddToCartButton";
+import { ActionButton } from "@/components/ui/ActionButton";
 import { CategoryTag } from "@/components/ui/CategoryTag";
 import { ColorSwatch } from "@/components/ui/ColorSwatch";
 import { PageWrapper } from "@/components/ui/PageWrapper";
 import { ProductCard } from "@/components/ui/ProductCard";
-import { ProductDetailsHeader } from "@/components/ui/ProductDetailsHeader";
 
+import { ImageGallery } from "@/components/ui/ImageGallery";
 import { RatingDisplay } from "@/components/ui/RatingDisplay";
 import { ReviewSection } from "@/components/ui/ReviewSection";
 import { useProductDetails } from "@/hooks/useProductDetails";
-import { ImageGallery } from "@/components/ui/ImageGallery";
+import { useCart } from "@/contexts/CartContext";
 
 // Product data interface
 interface ProductData {
@@ -297,6 +297,27 @@ export default function ProductDetailsScreen() {
     getDiscountAmount,
   } = useProductDetails(productData);
 
+  const { cartItems, updateQuantity } = useCart();
+
+  const currentCartItem = useMemo(() => {
+    const selectedKey = selectedColor || 'default';
+    return cartItems.find(
+      (i) => i.id === productData.id && (i.selectedColor || 'default') === selectedKey
+    );
+  }, [cartItems, productData.id, selectedColor]);
+
+  const incrementQty = useCallback(() => {
+    if (currentCartItem) {
+      updateQuantity(productData.id, currentCartItem.quantity + 1, selectedColor);
+    } else {
+      handleAddToCart();
+    }
+  }, [currentCartItem, updateQuantity, productData.id, selectedColor, handleAddToCart]);
+
+  const decrementQty = useCallback(() => {
+    if (!currentCartItem) return;
+    updateQuantity(productData.id, currentCartItem.quantity - 1, selectedColor);
+  }, [currentCartItem, updateQuantity, productData.id, selectedColor]);
   const handleBackPress = () => {
     // Navigate back
     router.back();
@@ -369,12 +390,6 @@ export default function ProductDetailsScreen() {
         // showHeader={false}
         
       >
-        {/* Header */}
-        {/* <ProductDetailsHeader
-          onBackPress={handleBackPress}
-          onWishlistPress={handleWishlistToggle}
-          isWishlisted={isWishlisted}
-        /> */}
 
         <ScrollView
           style={styles.scrollView}
@@ -397,7 +412,8 @@ export default function ProductDetailsScreen() {
                   type: 'image'
                 }))}
                 aspectRatio={4/3}
-                onImagePress={handleImagePress}
+                // Remove this line to enable built-in zoom functionality
+                // onImagePress={handleImagePress}
               />
             </LinearGradient>
           </View>
@@ -528,11 +544,39 @@ export default function ProductDetailsScreen() {
                 {productData.originalPrice}
               </Text>
             </View>
-            <Text style={styles.discountText}>
-              {productData.discountPercentage}% OFF
-            </Text>
+            {/* {
+              currentCartItem ? (
+                <View style={styles.qtyContainer}>
+                  <Pressable style={[styles.qtyButton, currentCartItem.quantity === 1 && styles.qtyButtonRemove]} onPress={decrementQty}>
+                    <Text style={[styles.qtyButtonText, currentCartItem.quantity === 1 && styles.qtyRemoveText]}>-</Text>
+                  </Pressable>
+                  <Text style={styles.qtyText}>{currentCartItem.quantity}</Text>
+                  <Pressable style={styles.qtyButton} onPress={incrementQty}>
+                    <Text style={styles.qtyButtonText}>+</Text>
+                  </Pressable>
+                </View>
+              ) : ( */}
+                <Text style={styles.discountText}>
+                  {productData.discountPercentage}% OFF
+                </Text>
+              {/* )
+            } */}
           </View>
-          <AddToCartButton onPress={handleAddToCart} loading={isAddingToCart} />
+          {currentCartItem ? (
+            <View style={styles.qtyControlsRight}>
+              <Pressable style={[styles.qtyButton, currentCartItem.quantity === 1 && styles.qtyButtonRemove]} onPress={decrementQty}>
+                <Text style={[styles.qtyButtonText, currentCartItem.quantity === 1 && styles.qtyRemoveText]}>-</Text>
+              </Pressable>
+              <Text style={styles.qtyText}>{currentCartItem.quantity}</Text>
+              <Pressable style={styles.qtyButton} onPress={incrementQty}>
+                <Text style={styles.qtyButtonText}>+</Text>
+              </Pressable>
+            </View>
+          ) : (
+         
+             <ActionButton onPress={handleAddToCart} loading={isAddingToCart} />
+          
+          )}
         </View>
       </PageWrapper>
     </GestureHandlerRootView>
@@ -688,5 +732,50 @@ const styles = StyleSheet.create({
     color: Colors.product.accentPink,
     fontWeight: "600",
     marginTop: 4,
+  },
+  qtyContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 6,
+  },
+  qtyButton: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#2A2E3A',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: Colors.product.borderLightWhite,
+  },
+  qtyButtonRemove: {
+    borderColor: '#FF6B6B',
+  },
+  qtyButtonText: {
+    color: '#F4F4F4',
+    fontSize: 16,
+    fontWeight: '700',
+    lineHeight: 18,
+  },
+  qtyRemoveText: {
+    color: '#FF6B6B',
+  },
+  qtyText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#F4F4F4',
+    marginHorizontal: 10,
+    minWidth: 18,
+    textAlign: 'center',
+  },
+  qtyControlsRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#2A2E3A',
+    borderRadius: 20,
+    paddingHorizontal: 4,
+    paddingVertical: 4,
+    borderWidth: 1,
+    borderColor: Colors.product.borderLightWhite,
   },
 });

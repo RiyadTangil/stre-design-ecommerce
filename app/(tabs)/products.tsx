@@ -13,7 +13,8 @@ import {
   View,
 } from "react-native";
 import { Colors } from "../../constants/Colors";
-const { height } = Dimensions.get('window')
+import { ActionButton } from "@/components/ui/ActionButton";
+const { height } = Dimensions.get("window");
 const POPULAR_PRODUCTS = [
   {
     id: "1",
@@ -99,7 +100,7 @@ const POPULAR_PRODUCTS = [
     discount: 10,
     isFavorite: false,
   },
-   {
+  {
     id: "7",
     title: "Blue Long Dress With Round Neck Denim",
     image: {
@@ -317,7 +318,6 @@ const FLASH_SALE_PRODUCTS = [
   },
 ];
 
-
 const ITEMS_PER_PAGE = 6;
 
 export default function ProductsScreen() {
@@ -327,7 +327,7 @@ export default function ProductsScreen() {
   const [bestProducts, setBestProducts] = useState(BEST_PRODUCTS);
   const [flashSaleProducts, setFlashSaleProducts] =
     useState(FLASH_SALE_PRODUCTS);
-  
+
   // Pagination states
   const [displayedProducts, setDisplayedProducts] = useState<any[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -345,20 +345,20 @@ export default function ProductsScreen() {
 
   const loadMoreProducts = () => {
     if (loading || !hasMore) return;
-    
+
     setLoading(true);
-    
+
     // Simulate API delay
     setTimeout(() => {
       const allProducts = getAllProducts();
       const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
       const endIndex = startIndex + ITEMS_PER_PAGE;
       const newProducts = allProducts.slice(startIndex, endIndex);
-      
+
       if (newProducts.length > 0) {
-        setDisplayedProducts(prev => [...prev, ...newProducts]);
-        setCurrentPage(prev => prev + 1);
-        
+        setDisplayedProducts((prev) => [...prev, ...newProducts]);
+        setCurrentPage((prev) => prev + 1);
+
         // Check if there are more products to load
         if (endIndex >= allProducts.length) {
           setHasMore(false);
@@ -366,7 +366,7 @@ export default function ProductsScreen() {
       } else {
         setHasMore(false);
       }
-      
+
       setLoading(false);
     }, 800); // Simulate network delay
   };
@@ -411,7 +411,7 @@ export default function ProductsScreen() {
         )
       );
     }
-    
+
     // Update displayed products as well
     setDisplayedProducts(
       displayedProducts.map((product) =>
@@ -424,7 +424,7 @@ export default function ProductsScreen() {
 
   const renderFooter = () => {
     if (!loading) return null;
-    
+
     return (
       <View style={styles.loadingFooter}>
         <ActivityIndicator size="large" color="#FF6B9D" />
@@ -434,11 +434,7 @@ export default function ProductsScreen() {
   };
 
   return (
-    <PageWrapper
-      title="Products"
-      showLogo={false}
-      leftIcon="back"
-    >
+    <PageWrapper title="Products" showLogo={false} leftIcon="back">
       <View style={styles.container}>
         {/* Tab Navigation */}
         <View style={styles.tabWrapper}>
@@ -469,31 +465,43 @@ export default function ProductsScreen() {
 
         {/* Product Grid */}
         <FlatList
-        data={displayedProducts}
-        renderItem={({ item }) => (
-          <ProductGridCard
-            item={item}
-            onPress={() => {
-              // Navigate to product details
-              router.push(`/product-details?id=${item.id}`);
-            }}
-            onToggleWishlist={() => toggleFavorite(item.id)}
-            showWishlistButton={true}
-          />
-        )}
-        keyExtractor={(item) => item.id}
-        numColumns={2}
-        showsVerticalScrollIndicator={false}
-        style={styles.productList}
-        contentContainerStyle={styles.productListContent}
-        columnWrapperStyle={styles.gridRow}
-        onEndReached={loadMoreProducts}
-        onEndReachedThreshold={0.1}
-         ListFooterComponent={renderFooter}
-       />
+          data={displayedProducts}
+          renderItem={({ item }) => (
+            <View style={styles.gridItem}>
+              <ProductGridCard
+                item={item}
+                onPress={() => {
+                  // Navigate to product details
+                  router.push(`/product-details?id=${item.id}`);
+                }}
+                onToggleWishlist={() => toggleFavorite(item.id)}
+                showWishlistButton={true}
+              >
+                <View style={{ paddingTop: 10 }}>
+                  <ActionButton
+                  size={5}
+                    onPress={() => {
+                      router.push(`/product-details?id=${item.id}`);
+                    }}
+                    text={"Details"}
+                  />
+                </View>
+              </ProductGridCard>
+            </View>
+          )}
+          keyExtractor={(item) => item.id}
+          numColumns={2}
+          showsVerticalScrollIndicator={false}
+          style={styles.productList}
+          contentContainerStyle={styles.productListContent}
+          columnWrapperStyle={styles.gridRow}
+          onEndReached={loadMoreProducts}
+          onEndReachedThreshold={0.1}
+          ListFooterComponent={renderFooter}
+        />
       </View>
-     </PageWrapper>
-   );
+    </PageWrapper>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -516,7 +524,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.product.background,
     zIndex: 1,
   },
-  
+
   backButton: {
     width: 40,
     height: 40,
@@ -531,9 +539,9 @@ const styles = StyleSheet.create({
   tabContainer: {
     backgroundColor: Colors.product.background,
     zIndex: 1,
-    position: 'relative',
+    position: "relative",
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.1)',
+    borderBottomColor: "rgba(255, 255, 255, 0.1)",
   },
   tabContent: {
     paddingHorizontal: 16,
@@ -564,20 +572,24 @@ const styles = StyleSheet.create({
     paddingBottom: 100, // Add padding at bottom for better scroll experience
   },
   gridRow: {
-    justifyContent: 'space-between',
+    justifyContent: "flex-start",
+  },
+  gridItem: {
+    width: '48%',
+    marginHorizontal: '1%',
   },
   loadingFooter: {
     paddingVertical: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     height: height - 200,
 
     flex: 1,
   },
   loadingText: {
     fontSize: 14,
-    color: '#9B9B9B',
-    textAlign: 'center',
+    color: "#9B9B9B",
+    textAlign: "center",
     marginTop: 8,
   },
 });

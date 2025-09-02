@@ -8,6 +8,7 @@ import {
     Text,
     View
 } from 'react-native';
+import { router } from 'expo-router';
 
 
 import { PageWrapper } from '@/components/ui/PageWrapper';
@@ -70,6 +71,10 @@ export default function ProfileScreen() {
 
   const handleOptionPress = (optionId: string) => {
     console.log('Option pressed:', optionId);
+    if (optionId === 'orders') {
+      router.push('/orders');
+      return;
+    }
   };
 
   return (
